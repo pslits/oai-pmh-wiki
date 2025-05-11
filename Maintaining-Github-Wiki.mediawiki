@@ -1,0 +1,69 @@
+= Maintaining the GitHub Wiki =
+
+This guide describes how to maintain your GitHub Wiki from a separate repository (''oai-pmh-wiki'') instead of editing the wiki directly. It allows full pull request (PR) workflows, reviews, and CI automation before publishing to the actual Wiki (''oai-pmh.wiki'').
+
+== Repository Structure ==
+
+* '''oai-pmh-wiki''': Separate repo that mirrors the contents of the GitHub Wiki.
+* '''oai-pmh.wiki''': The actual GitHub Wiki repository, updated automatically via GitHub Actions.
+
+== How It Works ==
+
+* All wiki content is versioned and edited in ''oai-pmh-wiki''.
+* Contributors create branches and submit pull requests to update the documentation.
+* When a PR is merged into ''master'', a GitHub Action automatically pushes the changes to the ''oai-pmh.wiki'' repo.
+
+== How to Make Changes ==
+
+'''Clone the Wiki Source Repository:'''
+<syntaxhighlight lang="bash">
+git clone https://github.com/pslits/oai-pmh-wiki.git
+cd oai-pmh-wiki
+</syntaxhighlight>
+
+'''Create a New Branch:'''
+<syntaxhighlight lang="bash">
+git checkout -b update-wiki-section
+</syntaxhighlight>
+
+'''Make Your Edits:'''
+* Edit or create `.md` files as needed.
+* Follow GitHub Wiki markdown style.
+
+'''Commit and Push:'''
+<syntaxhighlight lang="bash">
+git add .
+git commit -m "Update wiki section on harvesting"
+git push origin update-wiki-section
+</syntaxhighlight>
+
+'''Open a Pull Request:'''
+* Go to https://github.com/pslits/oai-pmh-wiki
+* Create a pull request from your branch into ''master''.
+
+'''Merge the PR:'''
+* Once reviewed and approved, merge the PR into ''master''.
+* This triggers the GitHub Action to publish the changes to the actual GitHub Wiki (''oai-pmh.wiki'').
+
+== Setting Up GitHub Secrets ==
+
+The ''oai-pmh-wiki'' repository must include these repository secrets (in '''Settings > Secrets and variables > Actions'''):
+
+{| class="wikitable"
+! Name !! Description
+|-
+| API_KEY || GitHub Personal Access Token with <code>repo</code> & <code>wiki</code> access
+|-
+| USERNAME || Your GitHub username (used for commit attribution)
+|-
+| EMAIL || Your GitHub email (used for commit attribution)
+|}
+
+== CI Workflow (Simplified) ==
+
+The <code>.github/workflows/push-wiki.yml</code> handles:
+
+* Cloning the ''oai-pmh.wiki'' repository
+* Pushing updates from the ''master'' branch of ''oai-pmh-wiki'' into it
+
+This ensures all changes go through code review and version control.

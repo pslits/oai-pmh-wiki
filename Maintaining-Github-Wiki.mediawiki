@@ -1,8 +1,22 @@
 = Maintaining the GitHub Wiki =
 
-The OAI-PMH Wiki is hosted on GitHub and is a valuable resource for documentation and collaboration. However, editing the wiki directly can be cumbersome and lacks version control. To address this, we have set up a separate repository to manage the wiki content.
+== Introduction ==
 
-This allows contributors to work on the wiki in a more structured way, using GitHub's pull request (PR) workflow, reviews and CI automation beor publishing to the actual Wiki. This guide will help you understand how the separate repository is setup and how to make changes to the wiki effectively.
+The OAI-PMH Wiki serves as a centralized repository for documentation, technical overviews, and usage guidelines related to the OAI-PMH project. Hosted on GitHub, it provides an accessible platform for sharing information. However, editing the GitHub Wiki directly through the browser interface presents several limitations:
+
+* **Immediate Live Changes**: Edits are published instantly without prior review, increasing the risk of errors.
+* **Limited Collaboration Support**: The lack of pull request (PR) workflows makes collaborative editing and peer reviews challenging.
+* **Basic Version Control**: While wikis are Git repositories, the version control features are not as robust or transparent as those in standard Git workflows.
+
+To address these challenges, we have adopted a more structured approach by maintaining the wiki content in a **dedicated GitHub repository** — `oai-pmh-wiki`. This separate repository mirrors the structure and content of the actual GitHub Wiki (`oai-pmh.wiki`) but enables a more professional development workflow. Contributors can:
+
+* **Propose Edits via Pull Requests**: Allowing for code reviews and discussions before changes are merged.
+* **Collaborate Effectively**: Utilizing branches and PRs facilitates better collaboration among team members.
+* **Leverage Continuous Integration (CI)**: Automated workflows can validate changes, generate diagrams, and synchronize content with the live wiki.
+
+This setup brings the benefits of software development best practices to documentation. Version control becomes reliable and transparent, accidental overwrites are avoided, and the review process ensures higher-quality contributions. Automated GitHub Actions are used to synchronize the content of the `oai-pmh-wiki` repository with the actual GitHub Wiki, ensuring that only approved changes are published.
+
+This guide provides step-by-step instructions for contributing to the wiki using this new workflow. Whether you're fixing a typo, adding a diagram, or documenting an entire feature, you'll learn how to make and propose changes in a way that is maintainable, reviewable, and traceable.
 
 == Setup of the separate repository ==
 

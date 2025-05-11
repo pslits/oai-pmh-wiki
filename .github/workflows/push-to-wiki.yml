@@ -10,16 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
-
       - name: Set up Git
         run: |
           git config --global user.email "${{ secrets.EMAIL }}"
           git config --global user.name "${{ secrets.USERNAME }}"
 
+      - name: Clone the target wiki repository
+        run: |
+          git clone https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh.wiki.git wiki
+          
       - name: Push to Wiki
         run: |
+          cd wiki
           git remote remove origin || true
           git remote add origin https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh.wiki.git
           git push origin master

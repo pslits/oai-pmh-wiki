@@ -15,11 +15,11 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.email "${{ secrets.GITHUB_EMAIL }}"
-          git config --global user.name "${{ secrets.GITHUB_USERNAME }}"
+          git config --global user.email "${{ secrets.EMAIL }}"
+          git config --global user.name "${{ secrets.USERNAME }}"
 
       - name: Push to Wiki
         run: |
           git remote remove origin || true
-          git remote add origin https://${{ secrets.GITHUB_API_KEY }}@github.com/pslits/oai-pmh.wiki.git
+          git remote add origin https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh.wiki.git
           git push origin master

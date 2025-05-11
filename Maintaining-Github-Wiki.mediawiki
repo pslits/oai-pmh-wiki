@@ -10,17 +10,17 @@ The wiki is maintained in a separate repository called ''oai-pmh-wiki''. This re
 
 === Creating the separate repository ===
 To set up the separate repository, follow these steps:
-1. Clone the ''oai-pmh.wiki'' repository
-2. Rename the cloned directory to ''oai-pmh-wiki''
-3. Create a new repository on GitHub named ''oai-pmh-wiki''
-4. Remove the origin from the cloned repository
-5. Add the new repository as the origin
-6. Push the cloned repository to the new GitHub repository
+# Clone the ''oai-pmh.wiki'' repository
+# Rename the cloned directory to ''oai-pmh-wiki''
+# Create a new repository on GitHub named ''oai-pmh-wiki''
+# Remove the origin from the cloned repository
+# Add the new repository as the origin
+# Push the cloned repository to the new GitHub repository
 
 === Create workflow ===
-1. Create a new directory called <code>.github/workflows</code> in the ''oai-pmh-wiki'' repository.
-2. Inside this directory, create a new file called <code>push-wiki.yml</code>.
-3. Add the following content to the <code>push-wiki.yml</code> file:
+# Create a new directory called <code>.github/workflows</code> in the ''oai-pmh-wiki'' repository.
+# Inside this directory, create a new file called <code>push-wiki.yml</code>.
+# Add the following content to the <code>push-wiki.yml</code> file:
 
 == Repository Structure ==
 
@@ -39,31 +39,31 @@ The repository structure is as follows:
 == How to Make Changes ==
 
 To make changes to the wiki, follow these steps:
-1. Clone the ''oai-pmh-wiki'' repository to your local machine.
+# Clone the ''oai-pmh-wiki'' repository to your local machine.
     <syntaxhighlight lang="bash">
     git clone https://github.com/pslits/oai-pmh-wiki.git
     cd oai-pmh-wiki
     </syntaxhighlight>
-2. Create a new branch for your changes.
+# Create a new branch for your changes.
     <syntaxhighlight lang="bash">
     git checkout -b update-wiki-section
     </syntaxhighlight>
-3. Make your edits to the markdown files in the repository.
+# Make your edits to the markdown files in the repository.
     * For example, if you want to update the section on harvesting, edit the corresponding markdown file.
     * You can also create new markdown files or folders as needed.
-4. Commit your changes and push them to the new branch.
+# Commit your changes and push them to the new branch.
     <syntaxhighlight lang="bash">
     git add .
     git commit -m "Update wiki section on harvesting"
     git push origin update-wiki-section
     </syntaxhighlight>
-5. Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.
+# Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.
     * Go to the ''oai-pmh-wiki'' repository on GitHub.
     * Click on the ''Pull requests'' tab.
     * Click on the ''New pull request'' button.
     * Select your branch from the dropdown menu and click ''Create pull request''.
     * Add a title and description for your pull request, explaining the changes you made.
-6. Once the pull request is reviewed and approved, it will be merged into the ''master'' branch.
+# Once the pull request is reviewed and approved, it will be merged into the ''master'' branch.
     * This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (''oai-pmh.wiki'').
 
 == Setting Up GitHub Secrets ==
@@ -89,10 +89,10 @@ To enable the GitHub Action to push changes to the ''oai-pmh.wiki'' repository, 
 
 The GitHub Action workflow is defined in the <code>.github/workflows/push-wiki.yml</code> file. This workflow is triggered whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
 The workflow performs the following steps:
-1. Clones the ''oai-pmh-wiki'' repository.
-2. Remove origin from the cloned repository.
-3. Adds the ''oai-pmh.wiki'' repository as the new origin.
-4. Configures Git with the provided username and email for commit attribution.
-5. Pushes the changes from the ''master'' branch of the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository.
+# Clones the ''oai-pmh-wiki'' repository.
+# Remove origin from the cloned repository.
+# Adds the ''oai-pmh.wiki'' repository as the new origin.
+# Configures Git with the provided username and email for commit attribution.
+# Pushes the changes from the ''master'' branch of the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository.
 
 This ensures all changes go through code review and version control.

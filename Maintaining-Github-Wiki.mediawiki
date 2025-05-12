@@ -2,19 +2,26 @@
 
 == Introduction ==
 
-The OAI-PMH Wiki serves as a centralized repository for documentation, technical overviews, and usage guidelines related to the OAI-PMH project. Hosted on GitHub, it provides an accessible platform for sharing information. However, editing the GitHub Wiki directly through the browser interface presents several limitations:
+A GitHub Wiki is a powerful tool for documenting projects, providing a user-friendly interface for creating and managing content. However, the default editing experience can be limiting, especially for collaborative projects. The limitations of the GitHub Wiki include:
 
-* '''Immediate Live Changes''': Edits are published instantly without prior review, increasing the risk of errors.
-* '''Limited Collaboration Support''': The lack of pull request (PR) workflows makes collaborative editing and peer reviews challenging.
-* '''Basic Version Control''': While wikis are Git repositories, the version control features are not as robust or transparent as those in standard Git workflows.
+* '''Immediate Live Changes''': Changes made in the wiki are live immediately, which can lead to accidental overwrites or incomplete documentation being published.
+* '''Limited Collaboration Support''': The GitHub Wiki does not support pull requests or code reviews, making it difficult to manage contributions from multiple authors.
+* '''Basic Version Control''': While GitHub provides version control, the wiki's interface does not leverage this effectively, making it hard to track changes or revert to previous versions.
 
-To address these challenges, we have adopted a more structured approach by maintaining the wiki content in a '''dedicated GitHub repository''' — `oai-pmh-wiki`. This separate repository mirrors the structure and content of the actual GitHub Wiki (`oai-pmh.wiki`) but enables a more professional development workflow. Contributors can:
+To address these challenges, a more structured approach to maintaining the wiki is proposed. This approach involves using GitHub's version control capabilities more effectively and enhancing collaboration among contributors. The solution is to improve the GitHub Wiki experience by using a separate repository for wiki content. This separate repository mirrors the GitHub Wiki but allows for a more professional development workflow. Contributers can:
 
-* '''Propose Edits via Pull Requests''': Allowing for code reviews and discussions before changes are merged.
-* '''Collaborate Effectively''': Utilizing branches and PRs facilitates better collaboration among team members.
-* '''Leverage Continuous Integration (CI)''': Automated workflows can validate changes, generate diagrams, and synchronize content with the live wiki.
+* '''Propose Edits via Pull Requests''': Contributors can create branches and pull requests for their changes, allowing for code reviews and discussions before merging.
+* '''Collaborate Effectively''': Multiple contributors can work on different branches, making it easier to manage contributions and avoid conflicts.
+* '''Leverage Continuous Integration (CI)''': The separate repository can be integrated with GitHub Actions to automate the process of pushing changes to the actual GitHub Wiki. This ensures that only approved changes are published, and the process is transparent and traceable.
 
 This setup brings the benefits of software development best practices to documentation. Version control becomes reliable and transparent, accidental overwrites are avoided, and the review process ensures higher-quality contributions. Automated GitHub Actions are used to synchronize the content of the `oai-pmh-wiki` repository with the actual GitHub Wiki, ensuring that only approved changes are published.
+
+This approach is inspired by tutorials and experiences shared by the developer community. A notable example is the article ["The Secret GitHub Wiki Repo and CI/CD for Docs"](https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e) by Sami Jawhar, which discusses the use of a separate GitHub repository for wiki content and the integration of CI/CD workflows to automate the process of pushing changes to the wiki. This article provides valuable insights into the benefits of using a separate repository for wiki content and how to set up a CI/CD pipeline for documentation. It is later also described in the [GitHub Wiki Tutorial for Technical Wiki Documentation](https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation) by Sparkbox, which outlines how to use a separate Git repository for wiki content while still leveraging GitHub Actions for automation.
+
+For further information and context:
+
+* GitHub Docs: [Creating and viewing wiki pages](https://docs.github.com/en/communities/documenting-your-project-with-wikis/creating-and-viewing-wiki-pages)
+* GitHub Actions: [Creating a GitHub Action](https://docs.github.com/en/actions/creating-actions)
 
 This guide provides step-by-step instructions for contributing to the wiki using this new workflow. Whether you're fixing a typo, adding a diagram, or documenting an entire feature, you'll learn how to make and propose changes in a way that is maintainable, reviewable, and traceable.
 

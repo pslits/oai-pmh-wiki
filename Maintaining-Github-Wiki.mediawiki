@@ -16,12 +16,12 @@ To address these challenges, a more structured approach to maintaining the wiki 
 
 This setup brings the benefits of software development best practices to documentation. Version control becomes reliable and transparent, accidental overwrites are avoided, and the review process ensures higher-quality contributions. Automated GitHub Actions are used to synchronize the content of the `oai-pmh-wiki` repository with the actual GitHub Wiki, ensuring that only approved changes are published.
 
-This approach is inspired by tutorials and experiences shared by the developer community. A notable example is the article ["The Secret GitHub Wiki Repo and CI/CD for Docs"](https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e) by Sami Jawhar, which discusses the use of a separate GitHub repository for wiki content and the integration of CI/CD workflows to automate the process of pushing changes to the wiki. This article provides valuable insights into the benefits of using a separate repository for wiki content and how to set up a CI/CD pipeline for documentation. It is later also described in the [GitHub Wiki Tutorial for Technical Wiki Documentation](https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation) by Sparkbox, which outlines how to use a separate Git repository for wiki content while still leveraging GitHub Actions for automation.
+This approach is inspired by tutorials and experiences shared by the developer community. A notable example is the article [https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e The Secret GitHub Wiki Repo and CI/CD for Docs] by Sami Jawhar, which discusses the use of a separate GitHub repository for wiki content and the integration of CI/CD workflows to automate the process of pushing changes to the wiki. This article provides valuable insights into the benefits of using a separate repository for wiki content and how to set up a CI/CD pipeline for documentation. It is later also described in the [https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation GitHub Wiki Tutorial for Technical Wiki Documentation] by Sparkbox, which outlines how to use a separate Git repository for wiki content while still leveraging GitHub Actions for automation.
 
 For further information and context:
 
-* GitHub Docs: [Creating and viewing wiki pages](https://docs.github.com/en/communities/documenting-your-project-with-wikis/creating-and-viewing-wiki-pages)
-* GitHub Actions: [Creating a GitHub Action](https://docs.github.com/en/actions/creating-actions)
+* GitHub Docs: [https://docs.github.com/en/communities/documenting-your-project-with-wikis/creating-and-viewing-wiki-pages Creating and viewing wiki pages]
+* GitHub Actions: [https://docs.github.com/en/actions/creating-actions Creating a GitHub Action]
 
 This guide provides step-by-step instructions for contributing to the wiki using this new workflow. Whether you're fixing a typo, adding a diagram, or documenting an entire feature, you'll learn how to make and propose changes in a way that is maintainable, reviewable, and traceable.
 

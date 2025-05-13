@@ -2,28 +2,32 @@
 
 == Introduction ==
 
-A GitHub Wiki is a powerful tool for documenting projects, providing a user-friendly interface for creating and managing content. However, the default editing experience can be limiting, especially for collaborative projects. The limitations of the GitHub Wiki include:
+GitHub Wikis are a convenient way to document projects, offering a simple interface for creating and managing content. However, their default editing experience poses significant limitations for collaborative and high-quality documentation efforts:
 
-* '''Immediate Live Changes''': Changes made in the wiki are live immediately, which can lead to accidental overwrites or incomplete documentation being published.
-* '''Limited Collaboration Support''': The GitHub Wiki does not support pull requests or code reviews, making it difficult to manage contributions from multiple authors.
-* '''Basic Version Control''': While GitHub provides version control, the wiki's interface does not leverage this effectively, making it hard to track changes or revert to previous versions.
+* '''Live Edits Without Review''': All changes go live immediately, increasing the risk of publishing incomplete or incorrect content.
+* '''No Pull Requests or Reviews''': Wikis lack support for pull requests, making it difficult to review and manage contributions from multiple collaborators.
+* '''Limited Version Control Interface''': Although GitHub tracks changes, the wiki interface does not make it easy to compare revisions or revert changes effectively.
 
-To address these challenges, a more structured approach to maintaining the wiki is proposed. This approach involves using GitHub's version control capabilities more effectively and enhancing collaboration among contributors. The solution is to improve the GitHub Wiki experience by using a separate repository for wiki content. This separate repository mirrors the GitHub Wiki but allows for a more professional development workflow. Contributers can:
+To overcome these limitations, this guide proposes using a separate GitHub repository to manage wiki content. This approach mirrors the official wiki while enabling a structured, collaborative documentation workflow. Key benefits include:
 
-* '''Propose Edits via Pull Requests''': Contributors can create branches and pull requests for their changes, allowing for code reviews and discussions before merging.
-* '''Collaborate Effectively''': Multiple contributors can work on different branches, making it easier to manage contributions and avoid conflicts.
-* '''Leverage Continuous Integration (CI)''': The separate repository can be integrated with GitHub Actions to automate the process of pushing changes to the actual GitHub Wiki. This ensures that only approved changes are published, and the process is transparent and traceable.
+* '''Pull Requests for Edits''': Contributors can submit changes via pull requests, enabling review, discussion, and approval before publishing.
+* '''Branch-Based Collaboration''': Multiple contributors can work in parallel without risking conflicts or overwrites.
+* '''CI/CD Integration with GitHub Actions''': Automated workflows push approved changes to the official GitHub Wiki, ensuring only vetted content is published.
 
-This setup brings the benefits of software development best practices to documentation. Version control becomes reliable and transparent, accidental overwrites are avoided, and the review process ensures higher-quality contributions. Automated GitHub Actions are used to synchronize the content of the `oai-pmh-wiki` repository with the actual GitHub Wiki, ensuring that only approved changes are published.
+This setup brings the rigor of modern software development—version control, code review, and automation—to your documentation process. It improves quality, reduces errors, and supports transparent collaboration.
 
-This approach is inspired by tutorials and experiences shared by the developer community. A notable example is the article [https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e The Secret GitHub Wiki Repo and CI/CD for Docs] by [https://github.com/sjawhar Sami Jawhar], which discusses the use of a separate GitHub repository for wiki content and the integration of CI/CD workflows to automate the process of pushing changes to the wiki. This article provides valuable insights into the benefits of using a separate repository for wiki content and how to set up a CI/CD pipeline for documentation. It is later also described in the [https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation GitHub Wiki Tutorial for Technical Wiki Documentation] by [https://github.com/rfearing Ricardo Feiring], which outlines how to use a separate Git repository for wiki content while still leveraging GitHub Actions for automation.
+The approach draws inspiration from best practices in the developer community, including:
+* [https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e The Secret GitHub Wiki Repo and CI/CD for Docs] by [https://github.com/sjawhar Sami Jawhar]
+* [https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation GitHub Wiki Tutorial for Technical Wiki Documentation] by [https://github.com/rfearing Ricardo Feiring]
+
+Both provide detailed guidance on setting up a standalone repository and integrating GitHub Actions for seamless documentation delivery.
 
 For further information and context:
 
 * GitHub Docs: [https://docs.github.com/en/communities/documenting-your-project-with-wikis/creating-and-viewing-wiki-pages Creating and viewing wiki pages]
 * GitHub Actions: [https://docs.github.com/en/actions/creating-actions Creating a GitHub Action]
 
-This guide provides step-by-step instructions for contributing to the wiki using this new workflow. Whether you're fixing a typo, adding a diagram, or documenting an entire feature, you'll learn how to make and propose changes in a way that is maintainable, reviewable, and traceable.
+Whether you're fixing a typo, adding visuals, or documenting a new feature, this guide will walk you through contributing to the wiki in a maintainable, reviewable, and traceable way.
 
 == Setup of the separate repository ==
 

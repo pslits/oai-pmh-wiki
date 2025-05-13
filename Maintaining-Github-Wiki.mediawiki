@@ -33,6 +33,13 @@ Whether you're fixing a typo, adding visuals, or documenting a new feature, this
 
 The wiki is maintained in a separate repository called ''oai-pmh-wiki''. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called ''oai-pmh.wiki''.
 
+=== Clone the ''oai-pmh.wiki'' repository ===
+
+The first step is to clone the ''oai-pmh.wiki'' repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
+
+<syntaxhighlight lang="bash">
+git clone <repository-url>.wiki.git
+
 === Creating the separate repository ===
 To set up the separate repository, follow these steps:
 # Clone the ''oai-pmh.wiki'' repository

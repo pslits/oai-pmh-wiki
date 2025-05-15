@@ -37,8 +37,7 @@ The wiki is maintained in a separate repository called ''oai-pmh-wiki''. This re
 
 The first step is to clone the ''oai-pmh.wiki'' repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
 
-<syntaxhighlight lang="bash">
-git clone <repository-url>.wiki.git
+ git clone <repository-url>.wiki.git
 
 === Creating the separate repository ===
 To set up the separate repository, follow these steps:
@@ -71,39 +70,34 @@ The repository structure is as follows:
 == How to Make Changes ==
 
 To make changes to the wiki, follow these steps:
-# Clone the ''oai-pmh-wiki'' repository to your local machine.
+
+'''Clone the ''oai-pmh-wiki'' repository to your local machine.'''
     
-<syntaxhighlight lang="bash">
-git clone https://github.com/pslits/oai-pmh-wiki.git
-cd oai-pmh-wiki
-</syntaxhighlight>
+ git clone https://github.com/pslits/oai-pmh-wiki.git
+ cd oai-pmh-wiki
 
-# Create a new branch for your changes.
+'''Create a new branch for your changes.'''
 
-<syntaxhighlight lang="bash">
-git checkout -b update-wiki-section
-</syntaxhighlight>
+ git checkout -b update-wiki-section
 
-# Make your edits to the markdown files in the repository.
-    * For example, if you want to update the section on harvesting, edit the corresponding markdown file.
-    * You can also create new markdown files or folders as needed.
+'''Make your edits to the markdown files in the repository.'''
+* For example, if you want to update the section on harvesting, edit the corresponding markdown file.
+* You can also create new markdown files or folders as needed.
 
-# Commit your changes and push them to the new branch.
+'''Commit your changes and push them to the new branch.'''
+ git add .
+ git commit -m "Update wiki section on harvesting"
+ git push origin update-wiki-section
 
-<syntaxhighlight lang="bash">
-git add .
-git commit -m "Update wiki section on harvesting"
-git push origin update-wiki-section
-</syntaxhighlight>
+'''Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.'''
+* Go to the ''oai-pmh-wiki'' repository on GitHub.
+* Click on the ''Pull requests'' tab.
+* Click on the ''New pull request'' button.
+* Select your branch from the dropdown menu and click ''Create pull request''.
+* Add a title and description for your pull request, explaining the changes you made.
 
-# Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.
-    * Go to the ''oai-pmh-wiki'' repository on GitHub.
-    * Click on the ''Pull requests'' tab.
-    * Click on the ''New pull request'' button.
-    * Select your branch from the dropdown menu and click ''Create pull request''.
-    * Add a title and description for your pull request, explaining the changes you made.
-# Once the pull request is reviewed and approved, it will be merged into the ''master'' branch.
-    * This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (''oai-pmh.wiki'').
+Once the pull request is reviewed and approved, it will be merged into the ''master'' branch.
+* This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (''oai-pmh.wiki'').
 
 == Setting Up GitHub Secrets ==
 

@@ -36,62 +36,68 @@ The wiki is maintained in a separate repository named *<repository>-wiki*. This 
 
 ### Clone the *`<repository>.wiki`* repository
 
-The first step is to clone the *<repository>.wiki* repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
+The first step is to clone the *`<repository>.wiki`* repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
 
 ```bash
 git clone <repository-url>.wiki.git
 ```
 
 === Rename the cloned directory ===
-After cloning the repository, rename the cloned directory to ''<repository-url>-wiki''. This will be the main repository where all wiki content is stored and versioned.
+After cloning the repository, rename the cloned directory to *`<repository-url>-wiki`*. This will be the main repository where all wiki content is stored and versioned.
 
- mv <repository_url>.wiki <repository_url>-wiki
+```bash
+mv <repository_url>.wiki <repository_url>-wiki
+```
 
 === Create a new repository on GitHub ===
-Next, create a new repository on GitHub named ''<repository-url>-wiki''. This will be the main repository where all wiki content is stored and versioned. Make sure to initialize the repository with a README file.
-* Go to your GitHub account.
-* Click on the ''+'' icon in the top right corner and select ''New repository''.
-* Name the repository ''<repository-url>-wiki''.
-* Add a description (optional).
-* Choose whether to make the repository public or private.
-* Initialize the repository with a README file.
-* Click on ''Create repository''.
+Next, create a new repository on GitHub named *`<repository-url>-wiki`*. This will be the main repository where all wiki content is stored and versioned. Make sure to initialize the repository with a README file.
+- Go to your GitHub account.
+- Click on the **+** icon in the top right corner and select **New repository**.
+- Name the repository *`<repository-url>-wiki`*.
+- Add a description (optional).
+- Choose whether to make the repository public or private.
+- Initialize the repository with a README file.
+- Click on **Create repository**.
 
-=== Remove the origin from the cloned repository ===
+### Remove the origin from the cloned repository
 After creating the new repository, you need to remove the origin from the cloned repository. This is necessary to prevent any conflicts when pushing changes to the new repository.
 
-<code>
+```bash
 cd repository-wiki
 git remote remove origin
-</code>
+```
 
-=== Add the new repository as the origin ===
+### Add the new repository as the origin
 Now, add the new repository as the origin for the cloned repository. This will allow you to push changes to the new repository.
 
-<code>git remote add origin <repository-url>-wiki.git<code>
+```bash
+git remote add origin <repository-url>-wiki.git
+```
 
-=== Push the cloned repository to the new GitHub repository ===
+### Push the cloned repository to the new GitHub repository
 Finally, push the cloned repository to the new GitHub repository. This will upload all the wiki content to the new repository.
 
- git push -u origin master 
+```bash
+git push -u origin master 
+```
 
-== Create workflow ==
+## Create workflow
 The next step is to create a GitHub Action workflow that will automatically push changes from the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
 
 You can create a new workflow by following these steps:
-# Go to the ''oai-pmh-wiki'' repository on GitHub.
-# Click on the ''Actions'' tab.
-# Click on the ''New workflow'' button.
-# Choose ''Set up a workflow yourself''.
-# This will create a new file called <code>main.yml</code> in the <code>.github/workflows</code> directory.
+- Go to the ''oai-pmh-wiki'' repository on GitHub.
+- Click on the ''Actions'' tab.
+- Click on the ''New workflow'' button.
+- Choose ''Set up a workflow yourself''.
+- This will create a new file called <code>main.yml</code> in the <code>.github/workflows</code> directory.
 
 You can also create the workflow file manually by following these steps:
-# Create a new directory called <code>.github/workflows</code> in the ''<repository-url>-wiki'' repository.
-# Inside this directory, create a new file called <code><workflow-name>.yml</code>.
+- Create a new directory called <code>.github/workflows</code> in the ''<repository-url>-wiki'' repository.
+- Inside this directory, create a new file called <code><workflow-name>.yml</code>.
 
-# Add the following content to the <code>push-wiki.yml</code> file:
+Add the following content to the <code>push-wiki.yml</code> file:
 
-== Repository Structure ==
+## Repository Structure
 
 The repository structure is as follows:
 * '''oai-pmh-wiki''': The main repository where all wiki content is stored and versioned.
@@ -160,10 +166,10 @@ To enable the GitHub Action to push changes to the ''oai-pmh.wiki'' repository, 
 
 The GitHub Action workflow is defined in the <code>.github/workflows/push-wiki.yml</code> file. This workflow is triggered whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
 The workflow performs the following steps:
-# Clones the ''oai-pmh-wiki'' repository.
-# Remove origin from the cloned repository.
-# Adds the ''oai-pmh.wiki'' repository as the new origin.
-# Configures Git with the provided username and email for commit attribution.
-# Pushes the changes from the ''master'' branch of the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository.
+- Clones the ''oai-pmh-wiki'' repository.
+- Remove origin from the cloned repository.
+- Adds the ''oai-pmh.wiki'' repository as the new origin.
+- Configures Git with the provided username and email for commit attribution.
+- Pushes the changes from the ''master'' branch of the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository.
 
 This ensures all changes go through code review and version control.

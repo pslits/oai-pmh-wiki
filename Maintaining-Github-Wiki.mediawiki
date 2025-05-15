@@ -57,13 +57,15 @@ Next, create a new repository on GitHub named ''<repository-url>-wiki''. This wi
 === Remove the origin from the cloned repository ===
 After creating the new repository, you need to remove the origin from the cloned repository. This is necessary to prevent any conflicts when pushing changes to the new repository.
 
- cd <repository-url>-wiki
- git remote remove origin
+<code>
+cd repository-wiki
+git remote remove origin
+</code>
 
 === Add the new repository as the origin ===
 Now, add the new repository as the origin for the cloned repository. This will allow you to push changes to the new repository.
 
- git remote add origin <repository-url>-wiki.git
+<code>git remote add origin <repository-url>-wiki.git<code>
 
 === Push the cloned repository to the new GitHub repository ===
 Finally, push the cloned repository to the new GitHub repository. This will upload all the wiki content to the new repository.

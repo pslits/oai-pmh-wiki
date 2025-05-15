@@ -1,43 +1,46 @@
-= Maintaining the GitHub Wiki =
+# Maintaining the GitHub Wiki
 
-== Introduction ==
+# Introduction
 
 GitHub Wikis are a convenient way to document projects, offering a simple interface for creating and managing content. However, their default editing experience poses significant limitations for collaborative and high-quality documentation efforts:
 
-* '''Live Edits Without Review''': All changes go live immediately, increasing the risk of publishing incomplete or incorrect content.
-* '''No Pull Requests or Reviews''': Wikis lack support for pull requests, making it difficult to review and manage contributions from multiple collaborators.
-* '''Limited Version Control Interface''': Although GitHub tracks changes, the wiki interface does not make it easy to compare revisions or revert changes effectively.
+- **Live Edits Without Review**: All changes go live immediately, increasing the risk of publishing incomplete or incorrect content.
+- **No Pull Requests or Reviews**: Wikis lack support for pull requests, making it difficult to review and manage contributions from multiple collaborators.
+- **Limited Version Control Interface**: Although GitHub tracks changes, the wiki interface does not make it easy to compare revisions or revert changes effectively.
 
 To overcome these limitations, this guide proposes using a separate GitHub repository to manage wiki content. This approach mirrors the official wiki while enabling a structured, collaborative documentation workflow. Key benefits include:
 
-* '''Pull Requests for Edits''': Contributors can submit changes via pull requests, enabling review, discussion, and approval before publishing.
-* '''Branch-Based Collaboration''': Multiple contributors can work in parallel without risking conflicts or overwrites.
-* '''CI/CD Integration with GitHub Actions''': Automated workflows push approved changes to the official GitHub Wiki, ensuring only vetted content is published.
+- **Pull Requests for Edits**: Contributors can submit changes via pull requests, enabling review, discussion, and approval before publishing.
+- **Branch-Based Collaboration**: Multiple contributors can work in parallel without risking conflicts or overwrites.
+- **CI/CD Integration with GitHub Actions**: Automated workflows push approved changes to the official GitHub Wiki, ensuring only vetted content is published.
 
 This setup brings the rigor of modern software development—version control, code review, and automation—to your documentation process. It improves quality, reduces errors, and supports transparent collaboration.
 
 The approach draws inspiration from best practices in the developer community, including:
-* [https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e The Secret GitHub Wiki Repo and CI/CD for Docs] by [https://github.com/sjawhar Sami Jawhar]
-* [https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation GitHub Wiki Tutorial for Technical Wiki Documentation] by [https://github.com/rfearing Ricardo Feiring]
+- [The Secret GitHub Wiki Repo and CI/CD for Docs](https://medium.com/@thecybermonk/the-secret-github-wiki-repo-and-ci-cd-for-docs-fafe2583b72e) by [Sami Jawhar](https://github.com/sjawhar)
+- [GitHub Wiki Tutorial for Technical Wiki Documentation](https://sparkbox.com/foundry/github_wiki_tutorial_for_technical_wiki_documentation) by [Ricardo Feiring](https://github.com/rfearing)
+
 
 Both provide detailed guidance on setting up a standalone repository and integrating GitHub Actions for seamless documentation delivery.
 
 For further information and context:
 
-* GitHub Docs: [https://docs.github.com/en/communities/documenting-your-project-with-wikis/creating-and-viewing-wiki-pages Creating and viewing wiki pages]
-* GitHub Actions: [https://docs.github.com/en/actions/creating-actions Creating a GitHub Action]
+* GitHub Docs: [Creating and viewing wiki pages](https://docs.github.com/en/communities/documenting-your-project-with-wikis/creating-and-viewing-wiki-pages)
+* GitHub Actions: [Creating a GitHub Action](https://docs.github.com/en/actions/creating-actions)
 
 Whether you're fixing a typo, adding visuals, or documenting a new feature, this guide will walk you through contributing to the wiki in a maintainable, reviewable, and traceable way.
 
-== Setup of the separate repository ==
+## Setup of the separate repository
 
-The wiki is maintained in a separate repository called ''oai-pmh-wiki''. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called ''oai-pmh.wiki''.
+The wiki is maintained in a separate repository named *<repository>-wiki*. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called *<repository>.wiki*.
 
-=== Clone the ''oai-pmh.wiki'' repository ===
+### Clone the *`<repository>.wiki`* repository
 
-The first step is to clone the ''oai-pmh.wiki'' repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
+The first step is to clone the *<repository>.wiki* repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
 
- git clone <repository-url>.wiki.git
+```bash
+git clone <repository-url>.wiki.git
+```
 
 === Rename the cloned directory ===
 After cloning the repository, rename the cloned directory to ''<repository-url>-wiki''. This will be the main repository where all wiki content is stored and versioned.

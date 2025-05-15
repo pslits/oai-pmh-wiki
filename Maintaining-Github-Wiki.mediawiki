@@ -39,18 +39,51 @@ The first step is to clone the ''oai-pmh.wiki'' repository to your local machine
 
  git clone <repository-url>.wiki.git
 
-=== Creating the separate repository ===
-To set up the separate repository, follow these steps:
-# Clone the ''oai-pmh.wiki'' repository
-# Rename the cloned directory to ''oai-pmh-wiki''
-# Create a new repository on GitHub named ''oai-pmh-wiki''
-# Remove the origin from the cloned repository
-# Add the new repository as the origin
-# Push the cloned repository to the new GitHub repository
+=== Rename the cloned directory ===
+After cloning the repository, rename the cloned directory to ''<repository-url>-wiki''. This will be the main repository where all wiki content is stored and versioned.
 
-=== Create workflow ===
-# Create a new directory called <code>.github/workflows</code> in the ''oai-pmh-wiki'' repository.
-# Inside this directory, create a new file called <code>push-wiki.yml</code>.
+ mv <repository_url>.wiki <repository_url>-wiki
+
+=== Create a new repository on GitHub ===
+Next, create a new repository on GitHub named ''<repository-url>-wiki''. This will be the main repository where all wiki content is stored and versioned. Make sure to initialize the repository with a README file.
+* Go to your GitHub account.
+* Click on the ''+'' icon in the top right corner and select ''New repository''.
+* Name the repository ''<repository-url>-wiki''.
+* Add a description (optional).
+* Choose whether to make the repository public or private.
+* Initialize the repository with a README file.
+* Click on ''Create repository''.
+
+=== Remove the origin from the cloned repository ===
+After creating the new repository, you need to remove the origin from the cloned repository. This is necessary to prevent any conflicts when pushing changes to the new repository.
+
+ cd <repository-url>-wiki
+ git remote remove origin
+
+=== Add the new repository as the origin ===
+Now, add the new repository as the origin for the cloned repository. This will allow you to push changes to the new repository.
+
+ git remote add origin <repository-url>-wiki.git
+
+=== Push the cloned repository to the new GitHub repository ===
+Finally, push the cloned repository to the new GitHub repository. This will upload all the wiki content to the new repository.
+
+ git push -u origin master 
+
+== Create workflow ==
+The next step is to create a GitHub Action workflow that will automatically push changes from the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
+
+You can create a new workflow by following these steps:
+# Go to the ''oai-pmh-wiki'' repository on GitHub.
+# Click on the ''Actions'' tab.
+# Click on the ''New workflow'' button.
+# Choose ''Set up a workflow yourself''.
+# This will create a new file called <code>main.yml</code> in the <code>.github/workflows</code> directory.
+
+You can also create the workflow file manually by following these steps:
+# Create a new directory called <code>.github/workflows</code> in the ''<repository-url>-wiki'' repository.
+# Inside this directory, create a new file called <code><workflow-name>.yml</code>.
+
 # Add the following content to the <code>push-wiki.yml</code> file:
 
 == Repository Structure ==

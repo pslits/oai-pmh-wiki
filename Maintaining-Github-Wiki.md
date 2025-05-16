@@ -42,7 +42,7 @@ The first step is to clone the *`<repository>.wiki`* repository to your local ma
 git clone <repository-url>.wiki.git
 ```
 
-=== Rename the cloned directory ===
+### Rename the cloned directory ===
 After cloning the repository, rename the cloned directory to *`<repository-url>-wiki`*. This will be the main repository where all wiki content is stored and versioned.
 
 ```bash
@@ -85,37 +85,37 @@ git push -u origin master
 The next step is to create a GitHub Action workflow that will automatically push changes from the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
 
 You can create a new workflow by following these steps:
-- Go to the ''oai-pmh-wiki'' repository on GitHub.
-- Click on the ''Actions'' tab.
-- Click on the ''New workflow'' button.
-- Choose ''Set up a workflow yourself''.
-- This will create a new file called <code>main.yml</code> in the <code>.github/workflows</code> directory.
+- Go to the **`<repository>-wiki`** repository on GitHub.
+- Click on the **Actions** tab.
+- Click on the **New workflow** button.
+- Choose **Set up a workflow yourself**.
+- This will create a new file called **`main.yml`** in the **`.github/workflows`** directory.
 
 You can also create the workflow file manually by following these steps:
-- Create a new directory called <code>.github/workflows</code> in the ''<repository-url>-wiki'' repository.
-- Inside this directory, create a new file called <code><workflow-name>.yml</code>.
+- Create a new directory called **`.github/workflows`** in the **`<repository>-wiki`** repository.
+- Inside this directory, create a new file called **`<workflow-name>.yml`**.
 
 Add the following content to the <code>push-wiki.yml</code> file:
 
 ## Repository Structure
 
 The repository structure is as follows:
-* '''oai-pmh-wiki''': The main repository where all wiki content is stored and versioned.
-* '''oai-pmh.wiki''': The actual GitHub Wiki repository, which is a mirror of the ''oai-pmh-wiki'' repository.
+* **`<repository>-wiki`**: The main repository where all wiki content is stored and versioned.
+* **`<repository>.wiki`**: The actual GitHub Wiki repository, which is a mirror of the *`<repository>-wiki`* repository.
 
-== How It Works ==
+## How It Works
 
-* The ''oai-pmh.wiki'' repository is a GitHub Wiki that is automatically updated from the ''oai-pmh-wiki'' repository.
-* The ''oai-pmh-wiki'' repository is where all contributors work on the wiki content.
-* Contributors can clone the ''oai-pmh-wiki'' repository, make changes, and submit pull requests.
-* The pull requests are reviewed and merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
-* Once a pull request is merged, a GitHub Action is triggered to push the changes to the ''oai-pmh.wiki'' repository.
+* The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the ''oai-pmh-wiki'' repository.
+* The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
+* Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
+* The pull requests are reviewed and merged into the ''master'' branch of the *`<repository>-wiki`* repository.
+* Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
 
-== How to Make Changes ==
+## How to Make Changes
 
 To make changes to the wiki, follow these steps:
 
-'''Clone the ''oai-pmh-wiki'' repository to your local machine.'''
+**Clone the *`<repository>-wiki`* repository to your local machine.**
     
  git clone https://github.com/pslits/oai-pmh-wiki.git
  cd oai-pmh-wiki

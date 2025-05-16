@@ -97,6 +97,36 @@ You can also create the workflow file manually by following these steps:
 
 Add the following content to the <code>push-wiki.yml</code> file:
 
+```yaml
+name: Push Wiki to GitHub Wiki
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Git
+        run: |
+          git config --global user.email "${{ secrets.EMAIL }}"
+          git config --global user.name "${{ secrets.USERNAME }}"
+
+      - name: Clone the target wiki repository
+        run: |
+          git clone https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh-wiki.git wiki
+          
+      - name: Push to Wiki
+        run: |
+          cd wiki
+          git remote remove origin || true
+          git remote add origin https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh.wiki.git
+          git push origin master
+```
+
 ## Repository Structure
 
 The repository structure is as follows:
@@ -147,6 +177,19 @@ git push origin update-wiki-section
 
 Once the pull request is reviewed and approved, it will be merged into the **master** branch.
 - This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (**oai-pmh.wiki**).
+
+### Create Github access token
+
+To enable the GitHub Action to push changes to the *`<repository>.wiki`* repository, you need to create a GitHub Personal Access Token (PAT) with the necessary permissions. This token will be used for authentication when pushing changes to the wiki repository.
+- Go to your GitHub account settings.
+- Click on **Developer settings** in the left sidebar.
+- Click on **Personal access tokens**.
+- Click on **Tokens (classic)**.
+- Click on the **Generate new token** button.
+- Give your token a descriptive name (e.g., "Wiki Push Token").
+- Select the expiration date for the token (e.g., 30 days).
+- Click on the **Generate token** button.
+- Copy the generated token and store it in a secure place. You will need this token to set up the GitHub Action.
 
 ### Setting Up GitHub Secrets
 

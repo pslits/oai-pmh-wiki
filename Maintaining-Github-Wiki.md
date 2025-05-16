@@ -42,14 +42,14 @@ The first step is to clone the *`<repository>.wiki`* repository to your local ma
 git clone <repository-url>.wiki.git
 ```
 
-### Rename the cloned directory ===
+### Rename the cloned directory
 After cloning the repository, rename the cloned directory to *`<repository-url>-wiki`*. This will be the main repository where all wiki content is stored and versioned.
 
 ```bash
 mv <repository_url>.wiki <repository_url>-wiki
 ```
 
-=== Create a new repository on GitHub ===
+### Create a new repository on GitHub
 Next, create a new repository on GitHub named *`<repository-url>-wiki`*. This will be the main repository where all wiki content is stored and versioned. Make sure to initialize the repository with a README file.
 - Go to your GitHub account.
 - Click on the **+** icon in the top right corner and select **New repository**.
@@ -105,71 +105,61 @@ The repository structure is as follows:
 
 ## How It Works
 
-* The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the ''oai-pmh-wiki'' repository.
-* The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
-* Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
-* The pull requests are reviewed and merged into the ''master'' branch of the *`<repository>-wiki`* repository.
-* Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
+- The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the ''oai-pmh-wiki'' repository.
+- The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
+- Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
+- The pull requests are reviewed and merged into the ''master'' branch of the *`<repository>-wiki`* repository.
+- Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
 
 ## How to Make Changes
 
-To make changes to the wiki, follow these steps:
-
-**Clone the *`<repository>-wiki`* repository to your local machine.**
+### Clone the *`<repository>-wiki`* repository to your local machine.
     
- git clone https://github.com/pslits/oai-pmh-wiki.git
- cd oai-pmh-wiki
+```bash
+git clone <repository-url>.git
+cd <repository>
+```
 
-'''Create a new branch for your changes.'''
+### Create a new branch for your changes.
 
- git checkout -b update-wiki-section
+```bash
+git checkout -b update-wiki-section
+```
 
-'''Make your edits to the markdown files in the repository.'''
-* For example, if you want to update the section on harvesting, edit the corresponding markdown file.
-* You can also create new markdown files or folders as needed.
+### Make your edits to the markdown files in the repository.
+- For example, if you want to update the section on harvesting, edit the corresponding markdown file.
+- You can also create new markdown files or folders as needed.
 
-'''Commit your changes and push them to the new branch.'''
- git add .
- git commit -m "Update wiki section on harvesting"
- git push origin update-wiki-section
+### Commit your changes and push them to the new branch.
 
-'''Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.'''
-* Go to the ''oai-pmh-wiki'' repository on GitHub.
-* Click on the ''Pull requests'' tab.
-* Click on the ''New pull request'' button.
-* Select your branch from the dropdown menu and click ''Create pull request''.
-* Add a title and description for your pull request, explaining the changes you made.
+```bash
+git add .
+git commit -m "Update wiki section on harvesting"
+git push origin update-wiki-section
+```
 
-Once the pull request is reviewed and approved, it will be merged into the ''master'' branch.
-* This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (''oai-pmh.wiki'').
+### Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.'''
+- Go to the **oai-pmh-wiki** repository on GitHub.
+- Click on the **Pull requests** tab.
+- Click on the **New pull request** button.
+- Select your branch from the dropdown menu and click **Create pull request**.
+- Add a title and description for your pull request, explaining the changes you made.
 
-== Setting Up GitHub Secrets ==
+Once the pull request is reviewed and approved, it will be merged into the **master** branch.
+- This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (**oai-pmh.wiki**).
 
-To enable the GitHub Action to push changes to the ''oai-pmh.wiki'' repository, you need to set up some repository secrets in the ''oai-pmh-wiki'' repository. These secrets are used for authentication and commit attribution.
-* Go to the ''oai-pmh-wiki'' repository on GitHub.
-* Click on the ''Settings'' tab.
-* In the left sidebar, click on ''Secrets and variables''.
-* Click on ''Actions''.
-* Click on the ''New repository secret'' button.
-* Add the following secrets:
-{| class="wikitable"
-! Name !! Description
-|-
-| API_KEY || GitHub Personal Access Token with <code>repo</code> & <code>wiki</code> access
-|-
-| USERNAME || Your GitHub username (used for commit attribution)
-|-
-| EMAIL || Your GitHub email (used for commit attribution)
-|}
+### Setting Up GitHub Secrets
 
-== CI Workflow (Simplified) ==
+To enable the GitHub Action to push changes to the *`<repository>.wiki`* repository, you need to set up some repository secrets in the *`<repository>-wiki`* repository. These secrets are used for authentication and commit attribution.
+- Go to the **oai-pmh-wiki** repository on GitHub.
+- Click on the **Settings** tab.
+- In the left sidebar, click on **Secrets and variables**.
+- Click on **Actions**.
+- Click on the **New repository secret** button.
+- Add the following secrets:
 
-The GitHub Action workflow is defined in the <code>.github/workflows/push-wiki.yml</code> file. This workflow is triggered whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
-The workflow performs the following steps:
-- Clones the ''oai-pmh-wiki'' repository.
-- Remove origin from the cloned repository.
-- Adds the ''oai-pmh.wiki'' repository as the new origin.
-- Configures Git with the provided username and email for commit attribution.
-- Pushes the changes from the ''master'' branch of the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository.
-
-This ensures all changes go through code review and version control.
+| Name     | Description                                                                 |
+|----------|-----------------------------------------------------------------------------|
+| API_KEY  | GitHub Personal Access Token with `repo` & `wiki` access                    |
+| USERNAME | Your GitHub username (used for commit attribution)                          |
+| EMAIL    | Your GitHub email (used for commit attribution)                             |

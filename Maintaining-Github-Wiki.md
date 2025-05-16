@@ -1,6 +1,18 @@
+## Table of Contents
+
+- [Maintaining the GitHub Wiki](#maintaining-the-github-wiki)
+  - [Introduction](#introduction)
+  - [Setup of the separate repository](#setup-of-the-separate-repository)
+  - [Create workflow](#create-workflow)
+  - [Repository Structure](#repository-structure)
+  - [How It Works](#how-it-works)
+  - [How to Make Changes](#how-to-make-changes)
+  - [Create Github access token](#create-github-access-token)
+  - [Setting Up GitHub Secrets](#setting-up-github-secrets)
+
 # Maintaining the GitHub Wiki
 
-# Introduction
+## Introduction
 
 GitHub Wikis are a convenient way to document projects, offering a simple interface for creating and managing content. However, their default editing experience poses significant limitations for collaborative and high-quality documentation efforts:
 
@@ -32,7 +44,7 @@ Whether you're fixing a typo, adding visuals, or documenting a new feature, this
 
 ## Setup of the separate repository
 
-The wiki is maintained in a separate repository named *<repository>-wiki*. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called *<repository>.wiki*.
+The wiki is maintained in a separate repository named *`<repository>-wiki`*. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called *`<repository>.wiki`*.
 
 ### Clone the *`<repository>.wiki`* repository
 
@@ -82,7 +94,8 @@ git push -u origin master
 ```
 
 ## Create workflow
-The next step is to create a GitHub Action workflow that will automatically push changes from the ''oai-pmh-wiki'' repository to the ''oai-pmh.wiki'' repository whenever a pull request is merged into the ''master'' branch of the ''oai-pmh-wiki'' repository.
+
+The next step is to create a GitHub Action workflow that will automatically push changes from the *`<repository>-wiki`* repository to the *`<repository>.wiki`* repository whenever a pull request is merged into the **master** branch of the *`<repository>-wiki`* repository.
 
 You can create a new workflow by following these steps:
 - Go to the **`<repository>-wiki`** repository on GitHub.
@@ -95,7 +108,7 @@ You can also create the workflow file manually by following these steps:
 - Create a new directory called **`.github/workflows`** in the **`<repository>-wiki`** repository.
 - Inside this directory, create a new file called **`<workflow-name>.yml`**.
 
-Add the following content to the <code>push-wiki.yml</code> file:
+Add the following content to the file:
 
 ```yaml
 name: Push Wiki to GitHub Wiki
@@ -117,13 +130,13 @@ jobs:
 
       - name: Clone the target wiki repository
         run: |
-          git clone https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh-wiki.git wiki
+          git clone https://${{ secrets.API_KEY }}@<repository-url>-wiki.git wiki
           
       - name: Push to Wiki
         run: |
           cd wiki
           git remote remove origin || true
-          git remote add origin https://${{ secrets.API_KEY }}@github.com/pslits/oai-pmh.wiki.git
+          git remote add origin https://${{ secrets.API_KEY }}@<repository-url>.wiki.git
           git push origin master
 ```
 
@@ -135,10 +148,10 @@ The repository structure is as follows:
 
 ## How It Works
 
-- The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the ''oai-pmh-wiki'' repository.
+- The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the *`<repository>-wiki`* repository.
 - The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
 - Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
-- The pull requests are reviewed and merged into the ''master'' branch of the *`<repository>-wiki`* repository.
+- The pull requests are reviewed and merged into the **master** branch of the *`<repository>-wiki`* repository.
 - Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
 
 ## How to Make Changes
@@ -168,15 +181,15 @@ git commit -m "Update wiki section on harvesting"
 git push origin update-wiki-section
 ```
 
-### Open a pull request from your branch into the ''master'' branch of the ''oai-pmh-wiki'' repository.'''
-- Go to the **oai-pmh-wiki** repository on GitHub.
+### Open a pull request from your branch into the master branch of the *`<repository>-wiki`* repository.'''
+- Go to the *`<repository>-wiki`* repository on GitHub.
 - Click on the **Pull requests** tab.
 - Click on the **New pull request** button.
 - Select your branch from the dropdown menu and click **Create pull request**.
 - Add a title and description for your pull request, explaining the changes you made.
 
 Once the pull request is reviewed and approved, it will be merged into the **master** branch.
-- This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (**oai-pmh.wiki**).
+- This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (*`<repository>.wiki`*).
 
 ### Create Github access token
 
@@ -194,15 +207,15 @@ To enable the GitHub Action to push changes to the *`<repository>.wiki`* reposit
 ### Setting Up GitHub Secrets
 
 To enable the GitHub Action to push changes to the *`<repository>.wiki`* repository, you need to set up some repository secrets in the *`<repository>-wiki`* repository. These secrets are used for authentication and commit attribution.
-- Go to the **oai-pmh-wiki** repository on GitHub.
+- Go to the *`<repository>-wiki`* repository on GitHub.
 - Click on the **Settings** tab.
 - In the left sidebar, click on **Secrets and variables**.
 - Click on **Actions**.
 - Click on the **New repository secret** button.
 - Add the following secrets:
 
-| Name     | Description                                                                 |
-|----------|-----------------------------------------------------------------------------|
-| API_KEY  | GitHub Personal Access Token with `repo` & `wiki` access                    |
-| USERNAME | Your GitHub username (used for commit attribution)                          |
-| EMAIL    | Your GitHub email (used for commit attribution)                             |
+| Variable  | Description                                                |
+|-----------|------------------------------------------------------------|
+| `API_KEY` | GitHub Personal Access Token with `repo` and `wiki` scopes |
+| `USERNAME`| Your GitHub username (used for commit attribution)         |
+| `EMAIL`   | Your GitHub email (used for commit attribution)            |

@@ -2,15 +2,29 @@
 
 - [Maintaining the GitHub Wiki](#maintaining-the-github-wiki)
   - [Introduction](#introduction)
-  - [Setup of the separate repository](#setup-of-the-separate-repository)
+  - [Setting up the wiki repository](#setting-up-the-wiki-repository)
+    - [Clone the *`<repository>.wiki`* repository](#clone-the-repositorywiki-repository)
+    - [Rename the cloned directory](#rename-the-cloned-directory)
+    - [Create a new repository on GitHub](#create-a-new-repository-on-github)
+    - [Remove the origin from the cloned repository](#remove-the-origin-from-the-cloned-repository)
+    - [Add the new repository as the origin](#add-the-new-repository-as-the-origin)
+    - [Push the cloned repository to the new GitHub repository](#push-the-cloned-repository-to-the-new-github-repository)
   - [Create workflow](#create-workflow)
-  - [Repository Structure](#repository-structure)
-  - [How It Works](#how-it-works)
-  - [How to Make Changes](#how-to-make-changes)
-  - [Create Github access token](#create-github-access-token)
-  - [Setting Up GitHub Secrets](#setting-up-github-secrets)
-
-# Maintaining the GitHub Wiki
+    - [Create a GitHub Action workflow](#create-a-github-action-workflow)
+    - [Create Github access token](#create-github-access-token)
+    - [Setting up GitHub secrets](#setting-up-github-secrets) 
+  - [Repository structure](#repository-structure)
+  - [How it works](#how-it-works)
+  - [How to make changes](#how-to-make-changes)
+    - [Clone the *`<repository>-wiki`* repository to your local machine.](#clone-the-repository-wiki-repository-to-your-local-machine)
+    - [Create a new branch for your changes.](#create-a-new-branch-for-your-changes)
+    - [Make your edits to the markdown files in the repository.](#make-your-edits-to-the-markdown-files-in-the-repository)
+    - [Commit your changes and push them to the new branch.](#commit-your-changes-and-push-them-to-the-new-branch)
+    - [Open a pull request from your branch into the master branch of the *`<repository>-wiki`* repository.](#open-a-pull-request-from-your-branch-into-the-master-branch-of-the-repository-wiki-repository)
+    - [Merge the pull request.](#merge-the-pull-request)
+    - [Delete the branch.](#delete-the-branch)
+      
+# Maintaining the GitHub wiki
 
 ## Introduction
 
@@ -42,18 +56,15 @@ For further information and context:
 
 Whether you're fixing a typo, adding visuals, or documenting a new feature, this guide will walk you through contributing to the wiki in a maintainable, reviewable, and traceable way.
 
-## Setup of the separate repository
-
+## Setting up the wiki repository
 The wiki is maintained in a separate repository named *`<repository>-wiki`*. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called *`<repository>.wiki`*.
 
 ### Clone the *`<repository>.wiki`* repository
-
 The first step is to clone the *`<repository>.wiki`* repository to your local machine. This repository contains the actual wiki content that is displayed on GitHub.
 
 ```bash
 git clone <repository-url>.wiki.git
 ```
-
 ### Rename the cloned directory
 After cloning the repository, rename the cloned directory to *`<repository-url>-wiki`*. This will be the main repository where all wiki content is stored and versioned.
 
@@ -95,6 +106,7 @@ git push -u origin master
 
 ## Create workflow
 
+### Create a GitHub Action workflow
 The next step is to create a GitHub Action workflow that will automatically push changes from the *`<repository>-wiki`* repository to the *`<repository>.wiki`* repository whenever a pull request is merged into the **master** branch of the *`<repository>-wiki`* repository.
 
 You can create a new workflow by following these steps:
@@ -139,58 +151,6 @@ jobs:
           git remote add origin https://${{ secrets.API_KEY }}@<repository-url>.wiki.git
           git push origin master
 ```
-
-## Repository Structure
-
-The repository structure is as follows:
-* **`<repository>-wiki`**: The main repository where all wiki content is stored and versioned.
-* **`<repository>.wiki`**: The actual GitHub Wiki repository, which is a mirror of the *`<repository>-wiki`* repository.
-
-## How It Works
-
-- The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the *`<repository>-wiki`* repository.
-- The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
-- Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
-- The pull requests are reviewed and merged into the **master** branch of the *`<repository>-wiki`* repository.
-- Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
-
-## How to Make Changes
-
-### Clone the *`<repository>-wiki`* repository to your local machine.
-    
-```bash
-git clone <repository-url>.git
-cd <repository>
-```
-
-### Create a new branch for your changes.
-
-```bash
-git checkout -b update-wiki-section
-```
-
-### Make your edits to the markdown files in the repository.
-- For example, if you want to update the section on harvesting, edit the corresponding markdown file.
-- You can also create new markdown files or folders as needed.
-
-### Commit your changes and push them to the new branch.
-
-```bash
-git add .
-git commit -m "Update wiki section on harvesting"
-git push origin update-wiki-section
-```
-
-### Open a pull request from your branch into the master branch of the *`<repository>-wiki`* repository.'''
-- Go to the *`<repository>-wiki`* repository on GitHub.
-- Click on the **Pull requests** tab.
-- Click on the **New pull request** button.
-- Select your branch from the dropdown menu and click **Create pull request**.
-- Add a title and description for your pull request, explaining the changes you made.
-
-Once the pull request is reviewed and approved, it will be merged into the **master** branch.
-- This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (*`<repository>.wiki`*).
-
 ### Create Github access token
 
 To enable the GitHub Action to push changes to the *`<repository>.wiki`* repository, you need to create a GitHub Personal Access Token (PAT) with the necessary permissions. This token will be used for authentication when pushing changes to the wiki repository.
@@ -204,7 +164,7 @@ To enable the GitHub Action to push changes to the *`<repository>.wiki`* reposit
 - Click on the **Generate token** button.
 - Copy the generated token and store it in a secure place. You will need this token to set up the GitHub Action.
 
-### Setting Up GitHub Secrets
+### Setting up GitHub secrets
 
 To enable the GitHub Action to push changes to the *`<repository>.wiki`* repository, you need to set up some repository secrets in the *`<repository>-wiki`* repository. These secrets are used for authentication and commit attribution.
 - Go to the *`<repository>-wiki`* repository on GitHub.
@@ -219,3 +179,66 @@ To enable the GitHub Action to push changes to the *`<repository>.wiki`* reposit
 | `API_KEY` | GitHub Personal Access Token with `repo` and `wiki` scopes |
 | `USERNAME`| Your GitHub username (used for commit attribution)         |
 | `EMAIL`   | Your GitHub email (used for commit attribution)            |
+
+
+## Repository structure
+
+The repository structure is as follows:
+* **`<repository>-wiki`**: The main repository where all wiki content is stored and versioned.
+* **`<repository>.wiki`**: The actual GitHub Wiki repository, which is a mirror of the *`<repository>-wiki`* repository.
+
+## How it works
+
+- The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the *`<repository>-wiki`* repository.
+- The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
+- Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
+- The pull requests are reviewed and merged into the **master** branch of the *`<repository>-wiki`* repository.
+- Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
+
+## How to make changes
+
+### Clone the *`<repository>-wiki`* repository to your local machine.
+To make changes to the wiki, you need to clone the *`<repository>-wiki`* repository to your local machine. This repository contains all the markdown files and assets used in the wiki.
+
+```bash
+git clone <repository-url>.git
+cd <repository>
+```
+
+### Create a new branch for your changes.
+Before making any changes, create a new branch for your changes. This will help keep your changes organized and separate from the main branch.
+
+```bash
+git checkout -b update-wiki-section
+```
+
+### Make your edits to the markdown files in the repository.
+- Open the markdown files in your favorite text editor.
+- Edit the files as needed. You can use Markdown syntax to format your content.
+- You can also create new markdown files or folders as needed.
+
+### Commit your changes and push them to the new branch.
+After making your changes, commit them to the new branch.
+
+```bash
+git add .
+git commit -m "Update wiki section on harvesting"
+git push origin update-wiki-section
+```
+
+### Open a pull request from your branch into the master branch of the *`<repository>-wiki`* repository.'''
+- Go to the *`<repository>-wiki`* repository on GitHub.
+- Click on the **Pull requests** tab.
+- Click on the **New pull request** button.
+- Select your branch from the dropdown menu and click **Create pull request**.
+- Add a title and description for your pull request, explaining the changes you made.
+
+### Merge the pull request.
+Once the pull request is reviewed and approved, it will be merged into the **master** branch.
+- This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (*`<repository>.wiki`*).
+
+### Delete the branch.
+After the pull request is merged, you can delete the branch to keep the repository clean.
+- Go to the **Pull requests** tab in the *`<repository>-wiki`* repository.
+- Click on the **Merged** pull request.
+- Click on the **Delete branch** button to delete the branch.

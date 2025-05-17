@@ -20,7 +20,7 @@
     - [Create a new branch for your changes.](#create-a-new-branch-for-your-changes)
     - [Make your edits to the markdown files in the repository.](#make-your-edits-to-the-markdown-files-in-the-repository)
     - [Commit your changes and push them to the new branch.](#commit-your-changes-and-push-them-to-the-new-branch)
-    - [Open a pull request from your branch into the master branch of the *`<repository>-wiki`* repository.](#open-a-pull-request-from-your-branch-into-the-master-branch-of-the-repository-wiki-repository)
+    - [Open a pull request from your branch into the main branch of the *`<repository>-wiki`* repository.](#open-a-pull-request-from-your-branch-into-the-main-branch-of-the-repository-wiki-repository)
     - [Merge the pull request.](#merge-the-pull-request)
     - [Delete the branch.](#delete-the-branch)
       
@@ -55,6 +55,12 @@ For further information and context:
 * GitHub Actions: [Creating a GitHub Action](https://docs.github.com/en/actions/creating-actions)
 
 Whether you're fixing a typo, adding visuals, or documenting a new feature, this guide will walk you through contributing to the wiki in a maintainable, reviewable, and traceable way.
+
+## Placeholder Convention
+This guide uses angle brackets (`<...>`) to represent placeholders. Replace them with real values:
+- `<repository-url>` → `https://github.com/your-org/your-repo`
+- `<repository>` → `your-repo`
+- `<workflow-name>` → `sync-wiki.yml`
 
 ## Setting up the wiki repository
 The wiki is maintained in a separate repository named *`<repository>-wiki`*. This repository contains all the markdown files and assets used in the wiki. The actual GitHub Wiki is a separate repository called *`<repository>.wiki`*.
@@ -101,14 +107,20 @@ git remote add origin <repository-url>-wiki.git
 Finally, push the cloned repository to the new GitHub repository. This will upload all the wiki content to the new repository.
 
 ```bash
-git push -u origin master 
+git push -u origin main 
 ```
 
 ## Create workflow
 
 ### Create a GitHub Action workflow
-The next step is to create a GitHub Action workflow that will automatically push changes from the *`<repository>-wiki`* repository to the *`<repository>.wiki`* repository whenever a pull request is merged into the **master** branch of the *`<repository>-wiki`* repository.
+The next step is to create a GitHub Action workflow that will automatically push changes from the *`<repository>-wiki`* repository to the *`<repository>.wiki`* repository whenever a pull request is merged into the **main** branch of the *`<repository>-wiki`* repository.
 
+```mermaid
+flowchart TD
+    A[Pull Request] -->|Merged| B[GitHub Action]
+    B --> C[Push to <repository>.wiki]
+    C --> D[GitHub Wiki]
+```
 You can create a new workflow by following these steps:
 - Go to the **`<repository>-wiki`** repository on GitHub.
 - Click on the **Actions** tab.
@@ -123,12 +135,19 @@ You can also create the workflow file manually by following these steps:
 Add the following content to the file:
 
 ```yaml
+# Replace the following placeholders:
+# <repository-url> with your GitHub repo slug (e.g., github.com/your-org/repo)
+# ${{ secrets.API_KEY }} with a Personal Access Token stored in GitHub Secrets
+# ${{ secrets.USERNAME }} with your GitHub username in GitHub Secrets
+# ${{ secrets.EMAIL }} with your GitHub email in GitHub Secrets
+# This workflow will push changes to the GitHub Wiki whenever a pull request is merged into the main branch of the <repository>-wiki repository.
+
 name: Push Wiki to GitHub Wiki
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -142,14 +161,14 @@ jobs:
 
       - name: Clone the target wiki repository
         run: |
-          git clone https://${{ secrets.API_KEY }}@<repository-url>-wiki.git wiki
+          git clone https://${{ secrets.API_KEY }}@<repository-url>-wiki.git wiki 2>/dev/null
           
       - name: Push to Wiki
         run: |
           cd wiki
-          git remote remove origin || true
-          git remote add origin https://${{ secrets.API_KEY }}@<repository-url>.wiki.git
-          git push origin master
+          git remote remove origin || true # !! true to ignore error if no remote is set
+          git remote add origin https://${{ secrets.API_KEY }}@<repository-url>.wiki.git 2>/dev/null
+          git push origin main
 ```
 ### Create Github access token
 
@@ -181,19 +200,27 @@ To enable the GitHub Action to push changes to the *`<repository>.wiki`* reposit
 | `EMAIL`   | Your GitHub email (used for commit attribution)            |
 
 
-## Repository structure
-
-The repository structure is as follows:
-* **`<repository>-wiki`**: The main repository where all wiki content is stored and versioned.
-* **`<repository>.wiki`**: The actual GitHub Wiki repository, which is a mirror of the *`<repository>-wiki`* repository.
-
 ## How it works
 
 - The *`<repository>.wiki`* repository is a GitHub Wiki that is automatically updated from the *`<repository>-wiki`* repository.
 - The *`<repository>-wiki`* repository is where all contributors work on the wiki content.
 - Contributors can clone the *`<repository>-wiki`* repository, make changes, and submit pull requests.
-- The pull requests are reviewed and merged into the **master** branch of the *`<repository>-wiki`* repository.
+- The pull requests are reviewed and merged into the **main** branch of the *`<repository>-wiki`* repository.
 - Once a pull request is merged, a GitHub Action is triggered to push the changes to the *`<repository>.wiki`* repository.
+
+### Repository Structure Diagram
+
+Use a tree-like text structure for clarity:
+```markdown
+📁 <repository>-wiki/
+├── .github/
+│   └── workflows/
+│       └── sync-wiki.yml
+├── README.md
+├── index.md
+└── images/
+    └── diagram.png
+```
 
 ## How to make changes
 
@@ -226,7 +253,7 @@ git commit -m "Update wiki section on harvesting"
 git push origin update-wiki-section
 ```
 
-### Open a pull request from your branch into the master branch of the *`<repository>-wiki`* repository.'''
+### Open a pull request from your branch into the main branch of the *`<repository>-wiki`* repository.
 - Go to the *`<repository>-wiki`* repository on GitHub.
 - Click on the **Pull requests** tab.
 - Click on the **New pull request** button.
@@ -234,7 +261,7 @@ git push origin update-wiki-section
 - Add a title and description for your pull request, explaining the changes you made.
 
 ### Merge the pull request.
-Once the pull request is reviewed and approved, it will be merged into the **master** branch.
+Once the pull request is reviewed and approved, it will be merged into the **main** branch.
 - This triggers a GitHub Action that automatically pushes the changes to the actual GitHub Wiki (*`<repository>.wiki`*).
 
 ### Delete the branch.

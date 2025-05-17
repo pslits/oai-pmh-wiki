@@ -166,7 +166,7 @@ jobs:
       - name: Push to Wiki
         run: |
           cd wiki
-          git remote remove origin || true # !! true to ignore error if no remote is set
+          git remote remove origin || true # || true to ignore error if no remote is set
           git remote add origin https://${{ secrets.API_KEY }}@<repository-url>.wiki.git 2>/dev/null
           git push origin main
 ```

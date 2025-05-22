@@ -4,80 +4,161 @@
 
 ## Introduction
 
-### Purpose of the Library
-The OAI-PMH Repository Library is designed to provide a modular, framework-agnostic implementation of the Open Archives Initiative Protocol for Metadata Harvesting (OAI-PMH) v2.0. It aims to facilitate the exposure of metadata from repositories to harvesters, enabling interoperability and data sharing across different systems.
+This document provides an architectural and conceptual overview of the **OAI-PMH Repository Library**, a PHP-based, modular library that implements the [Open Archives Initiative Protocol for Metadata Harvesting (OAI-PMH) version 2.0](https://www.openarchives.org/OAI/openarchivesprotocol.html). The library is designed to be framework-agnostic and can be integrated into any PHP-based repository system that needs to expose metadata to OAI-PMH harvesters.
 
-### Intended Audience
-This document is intended for developers, system architects, and technical stakeholders involved in the implementation and integration of OAI-PMH in PHP-based repository applications. It assumes familiarity with PHP programming, object-oriented design principles, and the OAI-PMH protocol.
+The primary goal of the library is to simplify the implementation of an OAI-PMH-compliant data provider. It enables repositories to share structured metadata with external systems such as aggregators, harvesters, and digital library platforms, all in a standardized way.
 
-### Scope of the Document
-This document outlines the architecture and key design concepts of the OAI-PMH Repository Library, a modular, PHP-based implementation of the Open Archives Initiative Protocol for Metadata Harvesting (OAI-PMH) v2.0.
+The library is built following Clean Architecture principles, which ensures a clear separation of concerns between domain logic, use cases, and infrastructure. This architectural approach enhances the maintainability, testability, and extensibility of the codebase, allowing developers to customize and adapt it to different storage systems, metadata formats, and domain models.
+
+This documentation serves as both a conceptual guide and a technical reference for understanding how the OAI-PMH Repository Library works, what components it consists of, and how it maps to the OAI-PMH specification. It is intended for:
+- **Developers** integrating OAI-PMH capabilities into PHP applications
+- **Architects** designing repository platforms that need metadata harvesting support
+- **Contributors** extending the functionality of the library
+
+The following chapters describe the library’s architecture, domain model, supported protocol features, and integration scenarios in detail.
 
 ## Overview
+The **OAI-PMH Repository Library** is a PHP-based software component that implements the Open Archives Initiative Protocol for Metadata Harvesting (OAI-PMH) version 2.0. The protocol defines a simple HTTP-based mechanism that allows external systems - called **harvesters** or **service providers** - to retrieve structured metadata from data-providing repositories.
 
-### What is OAI-PMH?
-The Open Archives Initiative Protocol for Metadata Harvesting (OAI-PMH) is a protocol designed to facilitate the exchange of metadata between repositories and service providers. It allows repositories to expose their metadata in a standardized format, enabling harvesters to collect and aggregate metadata from multiple sources.
-
-OAI-PMH is widely used in digital libraries, institutional repositories, and other metadata-rich environments to promote interoperability and data sharing.
-
-### Library Goals
-The OAI-PMH Repository Library aims to achieve the following goals:
-- **Modularity**: The library is designed to be modular and extensible, allowing developers to customize and extend its functionality based on their specific needs.
-- **Framework-Agnostic**: The library is framework-agnostic, meaning it can be integrated into any PHP-based application, regardless of the underlying framework (e.g., Laravel, Symfony).
-- **Compliance with OAI-PMH**: The library adheres to the OAI-PMH v2.0 specification, ensuring that it can communicate effectively with harvesters and other OAI-PMH-compliant systems.
+This library provides the building blocks needed to expose metadata from any PHP application in a way that complies with the OAI-PMH specification. It focuses on being:
+- **Modular** -  Composed of independent components that are easy to replace or extend.
+- **Framework-agnostic** -  Can be integrated into any PHP framework (e.g., Laravel, Symfony, Slim) or custom application.
+- **Extensible** -  Allows developers to define custom metadata formats, set hierarchies, and item structures.
+- **Specification-compliant** -  Ensures full support for the OAI-PMH v2.0 protocol, including all six verbs and selective harvesting.
 
 ### Key Features
-- **Support for OAI-PMH Verbs**: The library supports all six OAI-PMH verbs (Identify, ListRecords, ListIdentifiers, GetRecord, ListMetadataFormats, and ListSets) to facilitate metadata harvesting.
-- **Metadata Format Support**: The library allows for the registration of multiple metadata formats, enabling repositories to expose their metadata in various schemas (e.g., Dublin Core, MODS).
-- **Set Management**: The library supports the concept of sets, allowing repositories to group items logically for selective harvesting.
-- **Extensible Architecture**: The library is designed with a clean architecture, separating concerns and allowing for easy extension and customization of components.
-- **Error Handling**: The library provides robust error handling mechanisms, including OAI-PMH error codes and internal exceptions, to ensure reliable operation and clear communication of issues.
+- Implements all OAI-PMH verbs:
+    - Identify
+    - ListMetadataFormats
+    - ListSets
+    - GetRecord
+    - ListIdentifiers
+    - ListRecords
+- Supports pagination with resumption tokens.
+- Allows selective harvesting based on date ranges and sets.
+- Supports multiple metadata formats (e.g., Dublin Core, MODS).
+- Built with **Clean Architecture** for high separation of concerns and testability.
 
-### Design Philosophy (e.g., Clean Architecture, Framework-Agnostic)
-The OAI-PMH Repository Library is designed with Clean Architecture principles in mind. This approach emphasizes the separation of concerns, allowing for a clear distinction between the core business logic and the infrastructure components. By decoupling the protocol logic from the underlying framework, the library can be easily integrated into various PHP applications without being tied to a specific framework.
+### Design Philosophy
+The library is designed around the following principles:
+- **Domain-centric**: Core protocol concepts (items, metadata, sets) are modeled as pure PHP classes.
+- **Inversion of Control**: Application-specific logic (such as how items are stored or retrieved) is provided via interfaces.
+- **Protocol as Orchestration**: OAI-PMH logic acts as a coordinator, relying on injected components to handle repository-specific behavior.
 
-This design philosophy promotes testability, maintainability, and flexibility, enabling developers to adapt the library to their specific needs while adhering to the OAI-PMH protocol.
+By decoupling protocol logic from infrastructure details, the library can serve a wide range of use cases—from academic repositories and digital archives to content management systems and custom-built research tools.
 
 ## System Context
 
-### External Systems / Harvesters
-The OAI-PMH Repository Library interacts with external systems, primarily OAI-PMH harvesters. These harvesters are client applications that collect and aggregate metadata from multiple repositories. They send requests to the repository using the OAI-PMH protocol and expect standardized XML responses.
+The OAI-PMH Repository Library acts as the intermediary between a repository system and external harvesters by exposing repository metadata through a standardized protocol interface. This chapter explains the system's role within the broader ecosystem, the external actors it interacts with, and how it can be embedded in various PHP applications.
 
-### Integration in a PHP App
-The library can be integrated into any PHP-based application, regardless of the underlying framework. It provides a set of interfaces and classes that can be easily adapted to fit the specific architecture and design patterns of the application.
+### Role in the OAI-PMH Ecosystem
+OAI-PMH defines two main roles:
+- **Data Provider**: A repository that exposes metadata via OAI-PMH endpoints.
+- **Service Provider** (Harvester): An external system that retrieves metadata by sending OAI-PMH requests.
 
-### Role within the Repository Ecosystem
-The OAI-PMH Repository Library serves as a bridge between the repository's internal data structures and the external world of metadata harvesting. It exposes the repository's metadata through standardized OAI-PMH endpoints, allowing harvesters to access and collect metadata efficiently.
+This library enables any PHP-based repository system to function as a **Data Provider** by exposing a compliant OAI-PMH interface.
+
+### High-Level Data Flow
+
+```csharp
+Kopiëren
+Bewerken
+[Repository Storage] 
+       ⬇
+[Your Application (e.g., Laravel, Symfony)] 
+       ⬇
+[OAI-PMH Repository Library]
+       ⬇
+[OAI-PMH XML Response]
+       ⬇
+[Harvester]
+```
+1. A harvester sends a request (e.g., ListRecords) to your application.
+2. Your application routes the request to the OAI-PMH Repository Library.
+3. The library invokes configured interfaces to retrieve items, sets, and metadata.
+4. The library formats the response in XML according to OAI-PMH v2.0.
+5. The harvester receives the response and processes the metadata.
+
+### Integration Scenarios
+The library is designed to be embedded in a wide range of environments:
+- **Framework-based Applications**: Easily integrated into PHP frameworks like Laravel, Symfony, or Slim via adapters and service bindings.
+- **Custom PHP Applications**: Can be dropped into existing repositories with minimal dependencies.
+- **Headless API Services**: Used to expose repository data independently of the main application UI.
+
+Developers are responsible for implementing and binding the domain-specific interfaces (e.g., item providers, metadata formatters) to connect the library to their storage and application logic.
+
+### Deployment and Hosting
+Since the library is framework-agnostic, you are free to deploy it in any PHP environment that supports HTTP request handling. You may:
+- Route OAI-PMH requests via your existing HTTP router or controller layer.
+- Mount it as a dedicated endpoint (e.g., `/oai`) for harvesters.
+- Serve metadata from an internal or external database, search index, or CMS
 
 ## Architecture
+The **OAI-PMH Repository Library** is architected using the principles of Clean Architecture. This approach enforces a clear separation between business rules (protocol logic), application-specific implementations (e.g., data access), and delivery mechanisms (HTTP layer), resulting in a modular, maintainable, and testable codebase.
 
-### High-Level Architecture Diagram
-```mermaid
-graph TD
-    A[OAI-PMH Repository Library] -->|Uses| B[Core Entities]
-    A -->|Implements| C[OAI-PMH Protocol]
-    A -->|Integrates with| D[External Systems]
-    A -->|Provides| E[Interfaces and Extensibility]
-    A -->|Handles| F[Error Handling]
-    A -->|Supports| G[Configuration Options]
-```
-### Layers (e.g., Use Cases, Interfaces, Infrastructure)
-```mermaid
-graph TD
-    A[Use Cases] -->|Interacts with| B[Interfaces]
-    B -->|Implements| C[Core Entities]
-    C -->|Uses| D[Infrastructure]
-    D -->|Integrates with| E[External Systems]
-    E -->|Provides| F[Configuration Options]
+### Clean Architecture Overview
+Clean Architecture separates code into concentric layers. Dependencies always point inward, ensuring that the core logic is never dependent on external frameworks or infrastructure.
+
+Layers:
+- **Entities (Domain Layer)**: Contains the protocol’s core domain concepts: Item, MetadataRecord, Set, MetadataFormat, etc. These are pure PHP classes without dependencies.
+- **Use Cases (Application Layer)**: Contains logic for handling OAI-PMH verbs like ListRecords, Identify, etc. Each use case orchestrates calls to interfaces to retrieve and format data.
+- **Interfaces (Abstractions Layer)**: Declares contracts (PHP interfaces) for accessing items, sets, and metadata. These must be implemented by the integrating application.
+- **Frameworks & Drivers (Infrastructure Layer)**: Contains HTTP controllers, XML builders, and integrations. This is the outermost layer where actual input/output happens.
+
+Key Benefits:
+- Easy to swap storage engines or frameworks.
+- Business logic stays independent of HTTP routing and XML formatting.
+- Facilitates testing with mocks/stubs at every boundary.
+
+### Component Overview
+table
+| Component Name       | Description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| OAI-PMH Repository   | The main entry point for handling OAI-PMH requests and coordinating verbs.  |
+| VerbHandlers         | Classes that handle specific OAI-PMH verbs (e.g., GetRecordHandler).       |
+| Interfaces\ItemRepositoryInterface | Abstracts item access; implemented by the consuming application. |
+| XmlFormatter         | Converts internal representations into compliant OAI-PMH XML.             |
+| ResumptionTokenService | Manages pagination state between requests.                                 |
+
+Each component adheres to the Dependency Rule: outer layers depend on inner ones, never the reverse.
+
+### Technology Stack
+- **Language**: PHP 8.1+
+- **Protocol**: OAI-PMH v2.0 (spec link)
+- **Serialization**: Custom XML builder for strict spec compliance
+- **Optional**: PSR-7/15 support for HTTP abstraction (middleware-ready)
+
+### Architectural Diagram
+Here's a conceptual diagram (you can render this in a visual form later):
+
+```pgsql
++--------------------------+
+|  Controllers / HTTP API |
++--------------------------+
+            ⬇
++--------------------------+
+|     Use Case Handlers    |   ← Verbs: Identify, ListRecords, etc.
++--------------------------+
+            ⬇
++--------------------------+
+|  Interfaces / Contracts  |   ← ItemProviderInterface, MetadataFormatterInterface
++--------------------------+
+            ⬇
++--------------------------+
+|     Domain Entities      |   ← Item, MetadataRecord, Set, etc.
++--------------------------+
 ```
 
-### Responsibilities by Layer
-- **Use Cases**: Define the core business logic and interactions with the OAI-PMH protocol.
-- **Interfaces**: Provide abstractions for core entities, allowing for easy extension and customization.
-- **Core Entities**: Represent the key concepts in the OAI-PMH protocol, such as Items, Metadata Records, Sets, and Verbs.
-- **Infrastructure**: Handle the low-level details of data storage, network communication, and XML serialization.
-- **External Systems**: Interact with harvesters and other OAI-PMH-compliant systems, providing standardized responses.
-- **Configuration Options**: Allow for customization of the library's behavior and settings, enabling developers to adapt it to their specific needs.
+
+
+
+
+
+
+
+
+
+
 
 ## Core Entities and Relationships
 

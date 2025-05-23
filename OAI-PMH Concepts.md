@@ -149,22 +149,12 @@ Here's a conceptual diagram (you can render this in a visual form later):
 +--------------------------+
 ```
 
+## Domain Model
+The domain model defines the core entities and relationships required to implement the OAI-PMH protocol. These entities represent metadata concepts described in the OAI-PMH v2.0 specification, abstracted into PHP classes that are decoupled from any infrastructure concerns.
 
+This model also includes additional concepts that, while not part of the OAI-PMH protocol itself, are useful for organizing, filtering, and managing metadata within your repository.
 
-
-
-
-
-
-
-
-
-
-## Core Entities and Relationships
-
-### Table of Entities (what you already have)
-The OAI-PMH Repository Library is built around a set of core entities that represent the key concepts in the OAI-PMH protocol. These entities include:
-
+### Core Entities
 | Concept Name         | Description                                                                 |
 |----------------------|-----------------------------------------------------------------------------|
 | Item                | Represents a single record or object in the repository.                     |
@@ -177,13 +167,529 @@ The OAI-PMH Repository Library is built around a set of core entities that repre
 | ResumptionToken     | A pagination token for managing large result sets in harvesting.           |
 | Verb                | Represents the 6 allowed operations (e.g. Identify, ListRecords).         |
 
-Next to these core entities, there are additional concepts that are not part of the OAI-PMH protocol but are important for understanding the domain model. These include:
+### Supporting Domain Concepts
+Next to these core entities, there are additional concepts that are not part of the OAI-PMH specification, but are important for modeling and extending the library’s functionality in real-world repositories:
 
 | Concept Name        | Description                                                                 |
 |---------------------|-----------------------------------------------------------------------------|
 | ItemType           | Represents the type of an item, which can be used to filter or categorize items. |
 | ItemMetadataFormat | Represents the relationship between ItemTypes and MetadataFormats.               |
 | SetMembership      | Represents the relationship between Items and Sets.                            |
+
+These concepts enrich the library’s data model and provide more control over the organization and exposure of repository content.
+
+### Entity Relationships
+The core relationships between entities can be summarized as:
+- An Item:
+    - Has a unique Identifier
+    - Is timestamped with a Datestamp
+    - Has one or more MetadataRecords, each in a specific MetadataFormat
+    - Belongs to one or more Sets
+    - Has an optional ItemType
+- A MetadataFormat:
+    - Defines serialization rules
+    - May be restricted to certain ItemTypes via ItemMetadataFormat
+- A Set:
+    - Groups Items via SetMembership
+    - May be static or dynamically assigned
+
+Simplified Relationship Diagram
+```plaintext
+Item
+ ├── Identifier
+ ├── Datestamp
+ ├── ItemType
+ ├── MetadataRecord[]
+ │    └── MetadataFormat
+ ├── SetMembership[]
+ │    └── Set
+ └── ItemMetadataFormat[]
+      └── MetadataFormat
+```
+
+## Protocol Implementation
+This chapter describes how the OAI-PMH Repository Library implements the OAI-PMH v2.0 protocol operations (verbs) using the domain model and architectural components. It outlines the processing flow for each verb and how the library ensures compliance with the protocol specification.
+
+### Supported OAI-PMH Verbs
+The library fully supports the six verbs defined by the OAI-PMH protocol:
+
+| Verb                | Purpose                                                                 |
+|---------------------|-------------------------------------------------------------------------|
+| Identify           | Provides repository-level information and capabilities.                 |
+| ListMetadataFormats | Lists available metadata formats supported by the repository or for a specific item. |
+| ListSets           | Returns the sets available for selective harvesting.                    |
+| GetRecord          | Retrieves a single metadata record by its identifier and metadata format. |
+| ListIdentifiers    | Lists identifiers for records that meet specified criteria (e.g., date range, set). |
+| ListRecords        | Retrieves full metadata records matching specified criteria.            |
+
+Each verb is implemented as a dedicated handler class in the application layer. These handlers coordinate domain entity retrieval, apply filters, and delegate formatting to produce the protocol-compliant XML response.
+
+### Request Handling Flow
+- **Request Reception**: Incoming HTTP requests targeting the OAI-PMH endpoint are routed to the library’s entry point, typically via an HTTP controller or middleware.
+- **Verb Dispatching**: The library extracts the verb parameter and dispatches the request to the corresponding handler (e.g., ListRecordsHandler).
+- **Parameter Validation**: Each handler validates required and optional parameters according to the protocol, including date ranges (from, until), metadata format (metadataPrefix), and sets (set).
+- **Data Retrieval**: The handler calls repository interfaces (e.g., ItemRepositoryInterface, SetRepositoryInterface) to fetch matching items, identifiers, sets, or metadata records.
+- **Filtering & Pagination**: Results are filtered based on parameters. For large result sets, pagination is managed via the ResumptionToken mechanism, which encodes the state to continue harvesting.
+- **Response Construction**: The retrieved domain entities are passed to an XML formatter component, which serializes them into well-formed, valid OAI-PMH XML responses.
+- **Error Handling**: Invalid requests or protocol violations generate appropriate error responses with standardized error codes as defined by the OAI-PMH specification.
+
+### Resumption Tokens and Pagination
+To handle large result sets, the library implements resumption tokens, which encapsulate the harvesting state including:
+- Current cursor position
+- Expiration time
+- Filtering parameters
+
+Tokens are opaque to harvesters and must be accepted and returned unmodified. The library provides mechanisms to encode, decode, and validate resumption tokens transparently during request processing.
+
+### Metadata Formats and Crosswalks
+The library supports multiple metadata formats simultaneously. Each format is defined by:
+- metadataPrefix (e.g., oai_dc, mods)
+- XML namespace
+- XML schema URL
+
+Developers can extend the library by implementing custom MetadataFormat classes and crosswalks that transform repository metadata into the required XML schema.
+
+### Sets and Selective Harvesting
+The library supports hierarchical and flat sets, which allow harvesters to selectively request metadata from logical groups within the repository. Set membership is modeled as a relationship between items and sets and can be customized to support static or dynamic grouping strategies.
+
+## Integration and Usage
+This chapter provides guidance on integrating the OAI-PMH Repository Library into your existing PHP applications, configuring it to expose repository metadata, and extending its capabilities.
+
+### Installation
+The library can be installed via Composer:
+
+```bash
+composer require your-vendor/oai-pmh-repository
+Alternatively, download the source and include it in your project’s autoload setup.
+```
+### Integration in PHP Applications
+The library is designed to be framework-agnostic and can be integrated into any PHP environment. Below are typical integration scenarios:
+
+#### Framework-based Integration
+Routing: Define a route (e.g., /oai) that directs HTTP requests to a controller or middleware responsible for handling OAI-PMH requests.
+- **Dependency Injection**: Bind your domain-specific implementations of repository interfaces (ItemRepositoryInterface, SetRepositoryInterface, etc.) to the library’s abstractions.
+- **Request Handling**: Forward HTTP query parameters to the library’s main entry point for processing.
+
+Example in a Laravel controller method:
+
+```php
+public function oaiEndpoint(Request $request, OaiService $oaiService)
+{
+    $responseXml = $oaiService->handleRequest($request->query());
+    return response($responseXml, 200)
+           ->header('Content-Type', 'text/xml; charset=UTF-8');
+}
+```
+
+#### Custom PHP Applications
+- Include the library’s autoload files.
+- Implement required interfaces by connecting to your storage backend.
+- Instantiate and invoke the library’s request handler with query parameters.
+- Serve the generated XML response with the appropriate HTTP headers.
+
+### Configuration
+Configure the repository by:
+- Declaring supported metadata formats and crosswalks.
+- Defining sets and set hierarchies.
+- Implementing custom item and metadata providers to connect to your data source.
+- Setting server information (repository name, base URL, admin email) for Identify responses.
+
+Configuration can be done via PHP configuration files, service providers, or dependency injection containers depending on your application architecture.
+
+### Extending the Library
+To tailor the library to your repository’s unique requirements:
+- **Add Custom Metadata Formats**: Implement new metadata serializers and register them.
+- **Customize Item Retrieval**: Implement your own ItemRepositoryInterface to fetch records from databases, file systems, or APIs.
+- **Define Complex Sets**: Create dynamic sets based on business logic by customizing the SetRepositoryInterface.
+- **Enhance Verb Handlers**: Override or extend verb handlers to add custom validation or logging.
+
+### Running and Testing
+- Ensure your web server routes requests to the OAI-PMH endpoint correctly.
+- Use OAI-PMH validation tools (e.g., OAI Validator) to test compliance.
+- Write unit and integration tests for your implementations of domain interfaces and verb handlers.
+
+### Example Request
+A typical OAI-PMH request URL might look like:
+
+```pgsql
+https://your-domain.org/oai?verb=ListRecords&metadataPrefix=oai_dc&from=2023-01-01
+The library will parse this request, invoke the corresponding handler, and return a compliant XML response.
+```
+
+## Error Handling and Logging
+This chapter describes the mechanisms used by the OAI-PMH Repository Library to handle errors in compliance with the OAI-PMH protocol, as well as the logging strategies for diagnostics and auditing.
+
+### Protocol-Compliant Error Handling
+The OAI-PMH specification defines a set of standard error codes and their semantics. The library implements these by:
+- **Validating Requests**: All incoming requests are checked for missing or invalid parameters, unsupported verbs, and invalid combinations.
+- **Returning Error Responses**: When a protocol violation or invalid request is detected, the library returns an XML error response containing the appropriate `<error>` element with one of the following error codes:
+
+| Error Code         | Description                                                                 |
+|---------------------|-----------------------------------------------------------------------------|
+| badArgument        | The request includes illegal arguments, is missing required arguments, includes a repeated argument, or values for arguments have an illegal syntax. |
+| badResumptionToken | The value of the resumptionToken argument is invalid or expired.            |
+| badVerb            | Value of the verb argument is not a legal OAI-PMH verb, the verb argument is missing, or the verb argument is repeated. |
+| cannotDisseminateFormat | The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository. |
+| idDoesNotExist     | The value of the identifier argument is unknown or illegal in this repository. |
+| noRecordsMatch     | The combination of the values of the from, until, set and metadataPrefix arguments results in an empty list. |
+| noMetadataFormats  | There are no metadata formats available for the specified item.            |
+| noSetHierarchy     | The repository does not support sets.                                      |
+
+- **Detailed Error Messages**: Error responses include human-readable messages to facilitate debugging.
+
+### Exception Handling
+- The library uses structured exception handling internally.
+- Specific exceptions map to protocol error codes, ensuring consistent error reporting.
+- Unexpected exceptions are caught and logged, returning a generic server error response without exposing sensitive details.
+
+### Logging
+The library supports configurable logging to help developers monitor and troubleshoot the repository operations.
+- **Log Levels**: Supports standard log levels (DEBUG, INFO, WARNING, ERROR).
+- **Events Logged**:
+    - Incoming requests and their parameters.
+    - Successful and failed verb executions.
+    - Validation failures and protocol errors.
+    - Resumption token generation and usage.
+- **Integration**: The library can integrate with PSR-3 compatible logging libraries (e.g., Monolog).
+- **Custom Logging**: Developers can implement custom log handlers to forward logs to files, databases, or external monitoring services.
+
+### Best Practices
+- Enable logging at an appropriate level in production to capture errors without excessive verbosity.
+- Use error responses to provide clear guidance to harvesters and client developers.
+- Regularly review logs to detect unusual patterns or performance issues.
+- Implement automated tests that verify proper error handling for malformed or invalid requests.
+
+## Testing and Validation
+This chapter explains how to test and validate an implementation of the OAI-PMH Repository Library to ensure it meets functional requirements and conforms to the OAI-PMH 2.0 specification.
+
+### Types of Testing
+A robust testing strategy includes multiple test types across different layers of the system:
+
+#### Unit Testing
+- Focuses on individual components (e.g. VerbHandler, MetadataFormat, repository interfaces).
+- Mocks dependencies to isolate logic.
+- Ensures domain model behavior is predictable and correct.
+- Example tools: PHPUnit, Mockery
+
+#### Integration Testing
+- Tests interactions between components, such as retrieving records via repositories or rendering XML.
+- Validates correct data retrieval, formatting, and response composition.
+
+Scenarios:
+- Valid ListRecords request with filters
+- Invalid resumption token handling
+- Metadata format availability per item
+
+#### End-to-End Testing
+- Simulates full HTTP requests to the OAI endpoint.
+- Asserts against expected XML output and error responses.
+- Ensures that the request flow through routing, controller, handlers, and response formatting works end-to-end.
+
+### Validation Tools
+
+#### OAI Validator
+Use the official validator to test compliance with the [OAI-PMH specification](https://www.openarchives.org/OAI/validation):
+- Submit your base URL (e.g., https://yourdomain.org/oai) and review the results for:
+Proper response structure
+- Correct use of verb logic and error codes
+- Metadata validation (e.g. schema compliance for oai_dc)
+
+#### XML Schema Validation
+- Ensure all responses validate against their associated XML schemas.
+
+You can use tools like xmllint or PHP DOMDocument schema validation.
+
+```php
+$dom = new DOMDocument();
+$dom->loadXML($responseXml);
+$isValid = $dom->schemaValidate('oai_dc.xsd');
+```
+
+### Test Fixtures and Mock Repositories
+- Use fixture data for deterministic test cases.
+- Implement in-memory versions of ItemRepositoryInterface, SetRepositoryInterface, etc., to isolate tests from databases or APIs.
+- Create mock metadata records with known identifiers, datestamps, and set memberships.
+
+### Recommended Test Coverage
+- Focus on covering these critical areas:
+| Component          | Tests to Include                                                        |
+|---------------------|-------------------------------------------------------------------------|
+| Identify Handler    | Static metadata, base URL, admin contact info                          |
+| ListRecords, ListIdentifiers | Filtering logic, date ranges, resumption tokens                     |
+| GetRecord           | Valid/invalid identifier and format handling                           |
+| MetadataFormat     | Format registration, schema/namespace matching                         |
+| SetRepositoryInterface | Static and dynamic set listing and filtering                          |
+| Error Handling      | Protocol error codes, malformed requests                               |
+
+### CI/CD Integration
+- Integrate PHPUnit or similar testing tools into your continuous integration workflow.
+- Run validation and schema checks on pull requests.
+- Automate API-level tests using tools like Postman or HTTPie in CI.
+
+## Extensibility and Customization
+The OAI-PMH Repository Library is designed with modularity and flexibility in mind. It follows Clean Architecture principles to ensure that components are decoupled and easily extendable. This chapter describes the extension points available in the library and how developers can customize them to suit various use cases.
+
+### Core Extension Points
+#### Item and Metadata Repositories
+You can implement custom repositories to adapt the library to any data source.
+- **ItemRepositoryInterface**: Provides access to records for listing, filtering, and retrieval by identifier.
+- **MetadataFormatRepositoryInterface**: Manages the available metadata formats and their transformation logic.
+- **SetRepositoryInterface**: Allows definition of static or dynamic sets for selective harvesting.
+
+These interfaces should be implemented to connect to your database, CMS, file storage, or other systems.
+
+### Adding New Metadata Formats
+To add support for a custom metadata format:
+- Create a new class implementing a MetadataFormatInterface or extend a base formatter class.
+- Define:
+    - metadataPrefix (e.g., custom_format)
+    - XML namespace and schema location
+    - Serialization logic for converting items to XML
+- Register the format in your format repository or via service container.
+
+### Customizing Verb Behavior
+Each verb (e.g., ListRecords, GetRecord) is handled by a dedicated handler class.
+
+To customize verb behavior:
+- Extend the handler and override the handle() method.
+- Inject custom repositories or validation logic.
+- Wrap or replace core services with decorators or middleware for logging, filtering, etc.
+
+This is useful when you need:
+- Pre- or post-processing logic
+- Verb-specific business rules
+- Integration with other services (e.g., access control)
+
+### Supporting Dynamic Sets
+You can create dynamic set implementations by querying your data source with runtime logic.
+
+Example: Define sets based on subject categories, user roles, or content tags.
+- Implement SetRepositoryInterface.
+- Return an iterable list of Set entities based on conditions.
+- Implement filtering in ItemRepositoryInterface to match these sets.
+
+### Overriding Response Output
+By default, the library serializes responses into XML. To change this:
+- Replace or extend the ResponseBuilder or XmlFormatter component.
+- Add XSL transformations or adjust namespace formatting as needed.
+- Ensure that output remains compliant with OAI-PMH specifications.
+
+### Hook Points and Event Dispatching
+For more advanced customization:
+- Use event dispatching to hook into key lifecycle events (e.g., before/after verb handling).
+- Implement logging, audit trails, or analytics by subscribing to events.
+
+### Dependency Injection and Configuration
+- The library is designed to be used with any DI container.
+- Register your custom services by binding interfaces to implementations in your container.
+- Support for config-driven extensions via arrays, YAML, or PHP config files.
+
+### Example Use Cases
+
+| Use Case            | Customization Required                                                   |
+|---------------------|-------------------------------------------------------------------------|
+| Expose MODS and Dublin Core | Add custom metadata format handlers and register them. |
+| Integrate with DSpace/Fedora | Implement repository interfaces for your backend. |
+| Support hierarchical sets | Implement recursive SetRepositoryInterface. |
+| Enforce authorization on records | Extend verb handlers with access control logic. |
+| Add custom analytics | Dispatch events and log processing metadata. |
+
+## Deployment Considerations
+Deploying the OAI-PMH Repository Library involves more than just code installation. This chapter highlights key operational, performance, and maintenance aspects that should be addressed to ensure a secure, reliable, and standards-compliant deployment.
+
+### Environment Configuration
+Ensure your production environment is correctly configured:
+- **PHP Version**: Use a supported PHP version (preferably PHP 8.1 or later).
+- **Web Server**: Configure a web server (Apache, Nginx) to route requests to the OAI-PMH endpoint.
+- **HTTPS**: Serve the endpoint over HTTPS to protect metadata in transit.
+- **Timezone**: Set a consistent server timezone, ideally UTC, to avoid datestamp inconsistencies.
+
+### URL Structure
+- Define a stable and predictable OAI-PMH endpoint URL, e.g.:
+
+```arduino
+https://your-repository.org/oai
+```
+
+- Ensure it is accessible publicly if you want to allow open harvesting.
+- Avoid URL rewrites that might interfere with query parameters.
+
+### Performance Optimization
+#### Caching
+- Identify and ListMetadataFormats responses are static and can be cached aggressively.
+- Use HTTP headers or reverse proxies (e.g., Varnish) to cache responses where appropriate.
+- Internally cache expensive lookups such as metadata schema details or repository configuration.
+
+#### Pagination
+- Implement efficient paging using resumption tokens to handle large result sets.
+- Stream or batch large responses instead of loading everything into memory.
+
+#### Indexing
+Ensure your database is indexed on:
+- identifier
+- datestamp
+- setSpec (if using sets)
+
+This speeds up ListRecords and ListIdentifiers filtering.
+
+### Monitoring and Logging
+- Monitor request volume, response time, and error rates.
+- Integrate logging with systems like ELK, Graylog, or cloud-native solutions.
+- Keep audit logs of harvesting activity (optional, but useful for analytics or abuse detection).
+
+### Load Management
+- Throttle abusive or excessive harvesting via rate limiting.
+- Introduce Retry-After headers in case of server overload (though not mandated by OAI-PMH).
+- Optionally require API keys or tokens if your metadata is not fully open.
+
+### Compliance and Validation
+- Periodically re-validate your endpoint using the official OAI-PMH validator.
+- Verify that schema locations are resolvable and that output adheres to the expected XML structure.
+
+### Backup and Recovery
+- Backup configuration files, repository definitions, and metadata sources regularly.
+- Ensure versioning of the library and configuration to facilitate rollback in case of errors.
+
+### Security Considerations
+- Validate all input parameters to prevent injection or abuse.
+- Sanitize data passed into metadata serialization.
+- Log and monitor suspicious behavior, such as malformed requests or repeated errors.
+
+### Hosting Scenarios
+
+| Hosting Type       | Notes                                                                 |
+|---------------------|-----------------------------------------------------------------------|
+|Shared Hosting      | Ensure routing and HTTPS support; limited flexibility.               |
+| VPS / Cloud Server | Recommended for full control over PHP, web server, and caching setup. |
+| Containerized (Docker) | Enables easy deployment, scaling, and consistency across environments. |
+
+## Roadmap and Future Enhancements
+The OAI-PMH Repository Library is designed with long-term adaptability and extensibility in mind. This chapter outlines upcoming features, improvements under consideration, and opportunities for contribution.
+
+### Short-Term Roadmap
+- Improved Documentation
+    - Expand user guides and developer reference.
+    - Add detailed integration examples (e.g. with Laravel, Symfony).
+- Enhanced Testing Coverage
+    - Increase automated test coverage, especially for error handling and edge cases.
+    - Add test fixtures for real-world metadata samples.
+- Additional Metadata Formats
+    - Native support for more formats like:
+        - MODS (Metadata Object Description Schema)
+        - MARCXML
+        - METS
+    - Community-submitted format plugins.
+- CLI Tools for Setup and Diagnostics
+    - Command-line utility for:
+        - Validating repository configuration
+        - Generating metadata previews
+        - Running local compliance tests
+
+### Medium-Term Goals
+- Asynchronous Processing
+    - Support for streaming or queued processing for large record sets.
+    - Background generation of resumption-token-based pagination results.
+- Plugin System
+    - Allow third-party modules to register:
+        - Metadata format handlers
+        - Verb extensions
+        - Custom logging or analytics
+- Access Control Hooks
+    - Integrate permission checks to allow per-record or per-format restrictions.
+    - Optional user or token-based access layers for restricted repositories.
+- Distribution as Composer Package
+    - Official release via Packagist for easy inclusion in PHP projects.
+    - Versioned releases with semantic versioning (SemVer).
+
+### Long-Term Vision
+- Federation Support
+    - Future-proofing toward protocol extensions (e.g., OAI-ORE, ResourceSync).
+    - Allow metadata crosswalking or format transformation between protocols.
+- OAI-PMH Analytics Dashboard
+    - Admin dashboard for real-time insights into harvesting activity.
+    - Metrics: request volume, common queries, resumption token usage, response times.
+- Integration with Repository Platforms
+    - Bridges or plugins for platforms like:
+        - DSpace
+        - Omeka
+        - Islandora
+        - Custom CMS or DAM systems
+
+### Community Contributions
+The library is open to contributions in the following areas:
+
+| Contribution Type   | Description                                                                 |
+|---------------------|-----------------------------------------------------------------------------|
+| Code Improvements  | Bug fixes, performance enhancements, refactoring.                        |
+| Metadata Format Support | Adding support for new standards (e.g., MODS, MARCXML).               |
+| Documentation       | User guides, example repositories, troubleshooting FAQs.                 |
+| Test Cases          | New test scenarios or test coverage improvements.                        |
+| Localization        | Support for multilingual metadata and interface strings.                |
+| Issue Reporting     | Submitting bugs, feature requests, or integration feedback.             |
+
+Visit the GitHub repository to participate, open issues, or create pull requests.
+
+### Versioning and Release Plan
+Follows Semantic Versioning (SemVer):
+- MAJOR.MINOR.PATCH
+- Regular releases include:
+    - Bug fixes (patch)
+    - Backward-compatible features (minor)
+    - Breaking changes (major)
+
+## Glossary and References
+This chapter defines important terminology used throughout the OAI-PMH Repository Library documentation and provides authoritative references for further reading and validation.
+
+### Glossary
+
+| Term              | Definition                                                                 |
+|---------------------|-----------------------------------------------------------------------------|
+| OAI-PMH          | Open Archives Initiative Protocol for Metadata Harvesting; a standard for exposing metadata. |
+| Item             | A logical record in the repository, which can be harvested.               |
+| Metadata Record   | The metadata representation of an Item, including the header and format-specific content. |
+| Identifier        | A globally unique string that identifies an Item in the context of the repository. |
+| Datestamp        | The date the record was last modified or made available for harvesting.   |
+| Set              | A logical grouping of Items; may be used for selective harvesting.       |
+| Metadata Format   | A specific XML schema used to serialize an Item’s metadata (e.g., oai_dc). |
+| Resumption Token  | A continuation token used for paginating large result sets.              |
+| Verb             | An operation defined by the OAI-PMH protocol (e.g., Identify, ListRecords). |
+| Repository       | The application implementing OAI-PMH, serving Items and metadata to harvesters. |
+| Harvester        | A client that sends OAI-PMH requests to a repository to collect metadata. |
+| Clean Architecture | A software design principle that separates concerns and layers for modular, testable systems. |
+|---------------------|-----------------------------------------------------------------------------|
+
+### References
+Protocol Specifications
+- [OAI-PMH Version 2.0 Official Specification](https://www.openarchives.org/OAI/openarchivesprotocol.html)
+- [OAI-PMH XML Schema Definitions](https://www.openarchives.org/OAI/2.0/oai_dc.xsd)
+
+Related Standards
+- [Dublin Core Metadata Element Set](https://www.dublincore.org/specifications/dublin-core/dces/)
+- [MARCXML](https://www.loc.gov/standards/marcxml/)
+- [MODS Schema](https://www.loc.gov/standards/mods/)
+- [ResourceSync Framework](https://www.openarchives.org/rs/)
+
+Tools and Validators
+- [OAI-PMH Compliance Validator](https://www.openarchives.org/OAI/validation)
+- [XSD Schema Validator (W3C)](https://www.w3.org/2001/03/webdata/xsv)
+
+Development and Community
+- [OAI-PMH GitHub Repository](https://github.com/pslits/oai-pmh)
+- [OAI-PMH Wiki](https://github.com/pslits/oai-pmh-wiki)
+- [Open Archives Initiative](https://www.openarchives.org/)
+
+### Acknowledgements
+This library and documentation were developed with guidance from the official OAI-PMH specification and feedback from the open-source community. Contributions and peer reviews are welcomed via GitHub.
+
+
+
+
+
+
+
+
+
+## Core Concepts
 
 ### Repository
 A **repository** is a server that exposes structured metadata about resources through a standardized protocol. It is a network-accessible server that can process OAI-PMH requests and return responses formatted in XML. The repository acts as a data provider in the OAI-PMH ecosystem, allowing service providers to harvest metadata from multiple repositories. Key characteristics of a repository include:

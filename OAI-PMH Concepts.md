@@ -162,7 +162,7 @@ This model also includes additional concepts that, while not part of the OAI-PMH
 | Identifier          | A globally unique identifier for an item.                                  |
 | Datestamp           | Represents the last modified time of a record, critical for selective harvesting. |
 | Set                 | Represents logical groupings of items; may be hierarchical.                |
-| MetadataFormat      | Defines a supported format with schema, namespace, and prefix.             |
+| [MetadataFormat](MetadataFormat.md)      | Defines a supported format with schema, namespace, and prefix.             |
 | Repository          | The aggregate root that exposes the collection of Items, Sets, and supported Verbs. |
 | ResumptionToken     | A pagination token for managing large result sets in harvesting.           |
 | Verb                | Represents the 6 allowed operations (e.g. Identify, ListRecords).         |

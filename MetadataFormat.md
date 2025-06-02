@@ -38,7 +38,36 @@ The MetadataFormat class is responsible for:
 - **Pure domain logic**: No XML generation, parsing, validation, or I/O occurs within this class.
 - **Framework-agnostic**: Can be reused in any context (CLI, web, etc.).
 
+## User stories
+
+As a validator I need
+
+
+
+
+
+
+The MetadataFormat class is used in various scenarios within the OAI-PMH protocol implementation:
+- **ListMetadataFormats**: Provides format information for the ListMetadataFormats response.
+- **GetRecord**: Supplies the XML root element for serialization of records in the specified format.
+- **Validation**: Used by validation services to ensure incoming metadata conforms to the specified schema.
+- **Configuration**: Registered in the repository to expose available formats for OAI-PMH operations.
+
+
+// Following unit tests are needed
+// - use case for validator, needs
+//     - the metadata schema URL
+// - use case for Record metadata, needs
+//     - metadata namespace
+//     - metadata schema URL
+//     - metadata root element
+// - use case for ListMetadataFormats, needs
+//     - metadata prefix
+//     - metadata namespace
+//     - metadata schema URL
+
 ## Usage Scenarios
+
 - In ListMetadataFormats response:
 
 ```php
@@ -63,6 +92,40 @@ $metadataFormat->schemaUrl; // Used to validate incoming metadata
 - ItemMetadataFormat (pivot) associates ItemType with MetadataFormat
 - One Item may support multiple MetadataFormat representations
 - MetadataFormat does not depend on Item, maintaining separation of concerns
+
+
+```mermaid
+classDiagram
+    class MetadataFormat {
+        - MetadataPrefix prefix
+        - MetadataNamespaceCollection namespaces
+        - AnyUri schemaUrl
+        - MetadataRootTag rootTag
+    }
+    class MetadataPrefix
+    class MetadataNamespaceCollection {
+        - MetadataNamespace[] namespaces
+    }
+    class MetadataNamespace {
+        - NamespacePrefix prefix
+        - AnyUri uri
+    }
+    class NamespacePrefix
+    class AnyUri
+    class MetadataRootTag
+
+    MetadataFormat --> MetadataPrefix
+    MetadataFormat --> MetadataNamespaceCollection
+    MetadataFormat --> AnyUri
+    MetadataFormat --> MetadataRootTag
+
+    MetadataNamespaceCollection --> MetadataNamespace
+
+    MetadataNamespace --> NamespacePrefix
+    MetadataNamespace --> AnyUri
+```
+
+
 
 ```mermaid
 classDiagram

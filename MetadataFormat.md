@@ -1,98 +1,28 @@
 # MetadataFormat
 ## Purpose
-The MetadataFormat class is a domain-level value object that describes the static characteristics and capabilities of a supported metadata format within the OAI-PMH protocol. It encapsulates all metadata format-related declarations required by the repository for correct protocol exposure and internal handling.
+The `MetadataFormat` value object models a single metadata format declaration as defined by the [OAI-PMH](https://www.openarchives.org/OAI/openarchivesprotocol.html) specification. It encapsulates key information required by OAI-PMH clients to understand and request metadata in a specific format—namely the format's prefix, XML namespaces, and schema URL.
 
-This class does not perform serialization, transformation, or I/O. Its purpose is to declare and constrain metadata format configurations used across the application.
+This object exists as a value object in the domain model to provide:
+- Immutability: Once created, a `MetadataFormat` cannot be altered, ensuring consistency and preventing accidental mutations.
+- Clarity: It isolates metadata format logic from protocol or repository concerns, making the codebase easier to reason about.
+- Domain encapsulation: It represents a core OAI-PMH concept explicitly, improving alignment with the protocol and making the model more expressive.
 
-## Properties
+Using a dedicated value object makes interactions with metadata formats predictable and testable, while encouraging clean architecture and separation of concerns.
 
-| Property          | Type    | Description                                                                 |
-|-------------------|---------|-----------------------------------------------------------------------------|
-| prefix            | string  | OAI-PMH metadataPrefix (e.g., oai_dc) used in protocol verbs.             |
-| namespace         | string  | XML namespace associated with this format.                                 |
-| schemaUrl         | string  | Fully qualified URI of the XSD schema defining the format structure.       |
-| xmlRootElement    | string  | The root element of the XML representation for this format.                |
+## Class structure
+The `MetadataFormat` encapsulates the definition of a single metadata format used in the OAI-PMH protocol. It is composed of four strongly-typed value objects, each representing a core aspect of the format. The class is immutable and designed to express intent clearly, without exposing internal mutation or protocol-side logic.
 
-### Roadmap
+| Property         | Type            | Description                                                                |
+|------------------|-----------------|----------------------------------------------------------------------------|
+| `prefix`         | `MetadataPrefix`  | OAI-PMH metadataPrefix (e.g., `oai_dc`) used in protocol verbs.              |
+| `namespaces`     | `MetadataNamespaceCollection`  | Collection of namespaces associated with the metadata format, including prefixes and URIs. |
+| `schemaUrl`      | `AnyUri`          | Fully qualified URI of the XSD schema defining the format structure.       |
+| `xmlRootElement` | `MetadataRootTag` | The root element of the XML representation for this format.                |
 
-The core properties are sufficient for the OI-PMH protocol and basic metadata handling. If additional properties are needed in the future, they can be added without breaking existing functionality. The current design focuses on immutability and simplicity, ensuring that the class remains a pure domain object.
+🔒 Note: The `xmlRootElement` is not part of the OAI-PMH response but is used internally by the application. It defines the expected root XML element (e.g., `oai_dc:dc`) during serialization and helps ensure the generated XML matches the structure defined by the schema. This internal role supports both formatting and validation behind the scenes.
 
-Suggestions for future properties could include:
-
-| Property          | Type    | Description                                                                 |
-|-------------------|---------|-----------------------------------------------------------------------------|
-| schemaVersion     | string  | Version of the metadata format/schema (optional; useful for internal version tracking). |
-| mimeType          | string  | The MIME type associated with this format (optional).                     |
-| readable          | bool    | Indicates if metadata in this format can be harvested/exported.           |
-| writable          | bool    | Indicates if metadata in this format can be imported/stored via custom logic. |
-
-## Responsibilities
-The MetadataFormat class is responsible for:
-- Declaring static format metadata used in OAI-PMH protocol operations.
-- Serving as a source of truth for format-specific capabilities (e.g., can it be read/written?).
-- Associating the format with a schema validator (via class reference).
-- Enabling extensibility without coupling to infrastructure or serialization code.
-
-## Design Constraints
-- **Immutability**: All properties are set via constructor and marked readonly.
-- **Pure domain logic**: No XML generation, parsing, validation, or I/O occurs within this class.
-- **Framework-agnostic**: Can be reused in any context (CLI, web, etc.).
-
-## User stories
-
-As a validator I need
-
-
-
-
-
-
-The MetadataFormat class is used in various scenarios within the OAI-PMH protocol implementation:
-- **ListMetadataFormats**: Provides format information for the ListMetadataFormats response.
-- **GetRecord**: Supplies the XML root element for serialization of records in the specified format.
-- **Validation**: Used by validation services to ensure incoming metadata conforms to the specified schema.
-- **Configuration**: Registered in the repository to expose available formats for OAI-PMH operations.
-
-
-// Following unit tests are needed
-// - use case for validator, needs
-//     - the metadata schema URL
-// - use case for Record metadata, needs
-//     - metadata namespace
-//     - metadata schema URL
-//     - metadata root element
-// - use case for ListMetadataFormats, needs
-//     - metadata prefix
-//     - metadata namespace
-//     - metadata schema URL
-
-## Usage Scenarios
-
-- In ListMetadataFormats response:
-
-```php
-$metadataFormat->prefix; // Used in protocol output
-$metadataFormat->namespace;
-$metadataFormat->schemaUrl;
-```
-
-- In GetRecord response:
-
-```php
-$metadataFormat->xmlRootElement; // Used in XML serialization
-```
-
-- In validation:
-
-```php
-$metadataFormat->schemaUrl; // Used to validate incoming metadata
-```
-
-## Relationship in the Domain Model
-- ItemMetadataFormat (pivot) associates ItemType with MetadataFormat
-- One Item may support multiple MetadataFormat representations
-- MetadataFormat does not depend on Item, maintaining separation of concerns
-
+## Context diagram
+The following diagram illustrates the relationships between the `MetadataFormat` class and its components:
 
 ```mermaid
 classDiagram
@@ -125,7 +55,36 @@ classDiagram
     MetadataNamespace --> AnyUri
 ```
 
+## Context in OAI-PMH
+In the OAI-PMH protocol, a metadata format defines how metadata is structured and exchanged. Each repository must support at least one format—commonly Dublin Core (`oai_dc`)—and can offer others based on institutional or domain-specific needs.
 
+Metadata formats serve two key purposes in OAI-PMH:
+- Discovery via `ListMetadataFormats`:
+  Clients can query which formats are available using the `ListMetadataFormats` verb. Each format listed must include:
+    - `metadataPrefix`: A short identifier used in requests (e.g., `oai_dc`, `marc21`).
+    - `schema`: A URL to the XML Schema Definition (XSD) for validation.
+    - `metadataNamespace`: The XML namespace URI that defines the vocabulary.
+- Formatting Metadata Records:
+  When clients request records using `GetRecord` or `ListRecords`, they specify a `metadataPrefix` to indicate the desired metadata format. The repository then uses the corresponding metadata format definition to generate the response in the appropriate structure.
+
+🔒 Note: The `xmlRootElement` is not part of the OAI-PMH response but is used internally by the application. It defines the expected root XML element (e.g., `oai_dc:dc`) during serialization and helps ensure the generated XML matches the structure defined by the schema. This internal role supports both formatting and validation behind the scenes.
+
+By encapsulating all this information in a `MetadataFormat` value object, the system maintains a clean separation between protocol representation and application logic, while supporting accurate metadata generation for harvesting.
+
+## Validation
+Instead of validating directly within the `MetadataFormat` constructor, validation is delegated to its constituent value objects. In the following table, we see how each property is validated through its own dedicated value object:
+
+| Property       | Validated In                          | Validation Behavior                                      |
+|----------------|----------------------------------------|----------------------------------------------------------|
+| `prefix`         | `MetadataPrefix`                         | Must be a non-empty, valid OAI identifier                |
+| `namespaces`     | `MetadataNamespaceCollection / MetadataNamespace` | Must be non-empty, each with a valid prefix and URI      |
+| `schemaUrl`      | `AnyUri`                                 | Must be a well-formed URI                                |
+| `xmlRootElement` | `MetadataRootTag`                        | Must be a non-empty XML element name                     |
+
+## Relationship in the Domain Model
+- ItemMetadataFormat (pivot) associates ItemType with MetadataFormat
+- One Item may support multiple MetadataFormat representations
+- MetadataFormat does not depend on Item, maintaining separation of concerns
 
 ```mermaid
 classDiagram
